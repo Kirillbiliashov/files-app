@@ -1,3 +1,8 @@
+<style>
+  td a {
+    text-decoration: none;
+  }
+</style>
 <form>
   <div class="form-group">
     <input type="file" id="file" multiple (change)="uploadFile($event)" hidden #fileInput />
@@ -26,13 +31,15 @@
   </thead>
   <tbody>
 
-    <tr *ngFor="let file of files">
-      <td>
-        {{file.filename}}
-      </td>
-      <td>
-        {{file.length}}
-      </td>
+    <tr *ngFor="let file of files" >
+        <td>
+          <a data-href="/api/files/open/{{file.id}}" target="_blank">
+            {{file.filename}} 
+          </a>
+        </td>
+        <td>
+          {{file.length}}
+        </td>
     </tr>
   </tbody>
 </table>

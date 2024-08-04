@@ -23,5 +23,7 @@ namespace FilesApp.DAL
 
             return arr.ToList();
         }
+
+        public UserFile? Get(string id) => _files.Where(f => f.Id == id).FirstOrDefault();
     }
 }
