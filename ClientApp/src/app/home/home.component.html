@@ -27,6 +27,7 @@
     <tr>
       <th scope="col">Name</th>
       <th scope="col">Length</th>
+      <th scope="col">Modified</th>
     </tr>
   </thead>
   <tbody>
@@ -39,6 +40,9 @@
         </td>
         <td>
           {{file.length}}
+        </td>
+        <td>
+          {{file.modified | date:'medium'}}
         </td>
     </tr>
   </tbody>

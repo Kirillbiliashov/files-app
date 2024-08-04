@@ -17,7 +17,9 @@ export class FilesHttpService {
         const formData = new FormData();
 
         for (let i = 0; i < files.length; i++) {
+            console.log(files[i].lastModified)
             formData.append('files', files[i]);
+            formData.append(`lastModified_${i}`, files[i].lastModified.toString());
         }
 
         return this.client.post('api/files/upload', formData)

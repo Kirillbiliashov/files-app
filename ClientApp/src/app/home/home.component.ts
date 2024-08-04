@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit {
   uploadFile(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
+      
       this.filesService.uploadFiles(input.files)
         .subscribe(_ => this.loadFiles())
     }

@@ -14,6 +14,8 @@ namespace FilesApp.Models.DAL
 
         public long Length { get; init; }
 
+        public long Modified { get; init; }
+
         [JsonIgnore]
         public byte[] Content { get; init; }
     }

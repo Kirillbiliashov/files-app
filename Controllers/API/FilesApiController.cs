@@ -28,28 +28,31 @@ namespace FilesApp.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFiles(IFormFileCollection files)
+        public async Task<IActionResult> UploadFiles(List<IFormFile> files, [FromForm] Dictionary<string, string> lastModified)
         {
             if (files == null || files.Count == 0)
             {
                 return BadRequest();
             }
 
-            foreach (var file in files)
+            for (int i = 0; i < files.Count; i++)
             {
-                using (var memoryStream = file.OpenReadStream())
+                var lastModifiedKey = $"lastModified_{i}";
+                using (var memoryStream = files[i].OpenReadStream())
                 {
                     byte[] buffer = new byte[memoryStream.Length];
                     memoryStream.Read(buffer, 0, buffer.Length);
                     _storage.Add(new UserFile
                     {
                         Id = Guid.NewGuid().ToString(),
-                        Filename = file.FileName,
-                        Length = file.Length,
+                        Filename = files[i].FileName,
+                        Length = files[i].Length,
+                        Modified =long.Parse(lastModified[lastModifiedKey]),
                         Content = buffer
                     });
                 }
             }
+
 
             return Ok();
         }
