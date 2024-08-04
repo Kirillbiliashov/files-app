@@ -132,5 +132,8 @@
       }
     }
   },
-  "defaultProject": "FilesApp"
+  "defaultProject": "FilesApp",
+  "cli": {
+    "analytics": false
+  }
 }
