@@ -1,9 +1,20 @@
 <form>
   <div class="form-group">
     <input type="file" id="file" multiple (change)="uploadFile($event)" hidden #fileInput />
-    <button class="btn btn-primary" (click)="openFileChooser(fileInput)">Upload files</button>
+    <input type="file" id="folder" multiple (change)="uploadFile($event)" hidden #folderInput  webkitdirectory directory multiple/>
+    <div class="btn-group">
+      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        Upload
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" (click)="openFileChooser(fileInput)">File</a></li>
+        <li><a class="dropdown-item" (click)="openFileChooser(folderInput)">Folder</a></li>
+      </ul>
+    </div>
+
   </div>
 </form>
+
 
 <h3 style="margin-top: 50px">All files</h3>
 <table class="table">
