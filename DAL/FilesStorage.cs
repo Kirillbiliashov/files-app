@@ -16,10 +16,19 @@ namespace FilesApp.DAL
             _files.Add(file);
         }
 
-        public List<UserFile> GetAll() 
+        public List<UserFile> GetAll()
         {
             UserFile[] arr = new UserFile[_files.Count];
             _files.CopyTo(arr);
+
+            return arr.ToList();
+        }
+
+        public List<UserFile> GetTopLevelFiles()
+        {
+            var matches = _files.Where(f => f.FolderId == null).ToList();
+            UserFile[] arr = new UserFile[matches.Count];
+            matches.CopyTo(arr);
 
             return arr.ToList();
         }

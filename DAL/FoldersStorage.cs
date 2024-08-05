@@ -1,0 +1,30 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using FilesApp.Models.DAL;
+
+namespace FilesApp.DAL
+{
+    public class FoldersStorage
+    {
+        private readonly List<Folder> _folders = new List<Folder>();
+
+        public bool Exists(string folder) => _folders.Any(f => f.Name == folder);
+
+        public void Add(Folder folder)
+        {
+            _folders.Add(folder);
+        }
+
+        public List<Folder> GetTopLevelFolders()
+        {
+            var matches = _folders.Where(f => f.IsTopLevel).ToList();
+            Folder[] arr = new Folder[matches.Count];
+            matches.CopyTo(arr);
+
+            return arr.ToList();
+        }
+
+    }
+}

@@ -20,5 +20,7 @@ namespace FilesApp.Models.DAL
 
         [JsonIgnore]
         public byte[] Content { get; init; }
+
+        public string? FolderId { get; init; }
     }
 }

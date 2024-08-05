@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FilesHttpService } from '../services/files-service';
 import { UserFile } from '../models/user-file';
-import { GroupedFiles } from '../models/grouped-files';
+import { FileData } from '../models/file-data';
 
 @Component({
   selector: 'app-home',
@@ -9,7 +9,7 @@ import { GroupedFiles } from '../models/grouped-files';
 })
 export class HomeComponent implements OnInit {
 
-  public groupedFiles: GroupedFiles[] = [];
+  public data: FileData | null = null;
 
   constructor(private filesService: FilesHttpService) { }
 
@@ -32,18 +32,18 @@ export class HomeComponent implements OnInit {
 
   loadFiles() {
     this.filesService.getFiles()
-      .subscribe(files => {
-        console.log(files)
-        this.groupedFiles = files;
+      .subscribe(data => {
+        console.log(data)
+        this.data = data;
       });
   }
 
-  getFolderSize(group: GroupedFiles) {
-    return group.files.map(f => f.length).reduce((a, b) => a + b, 0);
-  }
+  // getFolderSize(group: GroupedFiles) {
+  //   return group.files.map(f => f.length).reduce((a, b) => a + b, 0);
+  // }
 
-  getFolderModified(group: GroupedFiles) {
-    return group.files.map(f => f.modified).reduce((a, b) => a > b? a : b);
-  }
+  // getFolderModified(group: GroupedFiles) {
+  //   return group.files.map(f => f.modified).reduce((a, b) => a > b? a : b);
+  // }
 
 }

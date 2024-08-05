@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<FilesStorage>();
+builder.Services.AddSingleton<FoldersStorage>();
 
 var app = builder.Build();
 
