@@ -12,6 +12,8 @@ namespace FilesApp.Models.DAL
 
         public string Filename { get; init; }
 
+         public string? Folder { get; init; }
+
         public long Length { get; init; }
 
         public long Modified { get; init; }

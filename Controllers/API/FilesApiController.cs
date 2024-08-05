@@ -24,11 +24,16 @@ namespace FilesApp.Controllers
         [HttpGet("")]
         public async Task<IActionResult> GetAllFiles()
         {
-            return Ok(_storage.GetAll());
+            var files = _storage.GetAll();
+            return Ok(files.GroupBy(f => f.Folder).Select(g => new 
+            {
+                Folder = g.Key,
+                Files = g
+            }));
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFiles(List<IFormFile> files, [FromForm] Dictionary<string, string> lastModified)
+        public async Task<IActionResult> UploadFiles(List<IFormFile> files, [FromForm] Dictionary<string, string> lastModified, [FromForm] string? folder)
         {
             if (files == null || files.Count == 0)
             {
@@ -42,13 +47,15 @@ namespace FilesApp.Controllers
                 {
                     byte[] buffer = new byte[memoryStream.Length];
                     memoryStream.Read(buffer, 0, buffer.Length);
+                    Console.WriteLine($"folder: {folder}");
                     _storage.Add(new UserFile
                     {
                         Id = Guid.NewGuid().ToString(),
                         Filename = files[i].FileName,
                         Length = files[i].Length,
                         Modified =long.Parse(lastModified[lastModifiedKey]),
-                        Content = buffer
+                        Content = buffer,
+                        Folder = folder
                     });
                 }
             }
