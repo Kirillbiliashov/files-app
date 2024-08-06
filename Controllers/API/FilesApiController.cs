@@ -29,7 +29,13 @@ namespace FilesApp.Controllers
             var files = _filesStorage.GetTopLevelFiles();
             var folders = _foldersStorage.GetTopLevelFolders();
 
-            return Ok(new { files, folders });
+            return Ok(new { files, folders = folders.Select(f => new
+            {
+                f.Id,
+                f.Name,
+                size = _filesStorage.GetFolderSize(f.Id),
+                lastModified = _filesStorage.GetFolderLastModified(f.Id)
+            }) });
         }
 
         [HttpPost("upload")]
@@ -53,7 +59,7 @@ namespace FilesApp.Controllers
                     _filesStorage.Add(new UserFile
                     {
                         Id = Guid.NewGuid().ToString(),
-                        Filename = files[i].FileName,
+                        Filename = files[i].FileName.Split("/").Last(),
                         Length = files[i].Length,
                         Modified = long.Parse(lastModified[lastModifiedKey]),
                         Content = buffer,

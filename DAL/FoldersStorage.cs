@@ -31,5 +31,7 @@ namespace FilesApp.DAL
             return _folders.Where(f => f.Name == folder).Select(f => f.Id).FirstOrDefault();
         }
 
+        public Folder? Get(string folderId) => _folders.Where(f => f.Id == folderId).FirstOrDefault();
+
     }
 }

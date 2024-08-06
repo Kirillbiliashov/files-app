@@ -10,6 +10,7 @@ namespace FilesApp.DAL
     {
         private readonly List<UserFile> _files = new List<UserFile>();
 
+        public UserFile? Get(string fileId) => _files.Where(f => f.Id == fileId).FirstOrDefault();
 
         public void Add(UserFile file)
         {
@@ -33,6 +34,17 @@ namespace FilesApp.DAL
             return arr.ToList();
         }
 
-        public UserFile? Get(string id) => _files.Where(f => f.Id == id).FirstOrDefault();
+        public List<UserFile> GetFolderFiles(string folderId)
+        {
+            var matches = _files.Where(f => f.FolderId == folderId).ToList();
+            UserFile[] arr = new UserFile[matches.Count];
+            matches.CopyTo(arr);
+
+            return arr.ToList();
+        }
+
+        public long GetFolderSize(string folderId) => _files.Where(f => f.FolderId == folderId).Sum(f => f.Length);
+
+        public long? GetFolderLastModified(string folderId) => _files.Where(f => f.FolderId == folderId).MaxBy(f => f.Modified)?.Modified;
     }
 }

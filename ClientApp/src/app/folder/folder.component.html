@@ -1,0 +1,50 @@
+<style>
+    td a {
+      text-decoration: none;
+    }
+  </style>
+  <form>
+    <div class="form-group">
+      <input type="file" id="file" multiple (change)="uploadFile($event)" hidden #fileInput />
+      <input type="file" id="folder" multiple (change)="uploadFile($event)" hidden #folderInput  webkitdirectory directory multiple/>
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          Upload
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" (click)="openFileChooser(fileInput)">File</a></li>
+          <li><a class="dropdown-item" (click)="openFileChooser(folderInput)">Folder</a></li>
+        </ul>
+      </div>
+  
+    </div>
+  </form>
+  
+  <h5 style="margin-top: 50px" >All files</h5>
+  <h3 *ngIf="fodlerData?.folder">{{fodlerData?.folder?.name}}</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Length</th>
+        <th scope="col">Modified</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngIf="fodlerData?.files">
+        <tr *ngFor="let file of fodlerData?.files">
+          <td>
+            <a [href]="'/api/files/open/' + file.id" target="_blank">
+              {{ file.filename }} 
+            </a>
+          </td>
+          <td>
+            {{  file.length }}
+          </td>
+          <td>
+            {{  file.modified | date:'medium' }}
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>

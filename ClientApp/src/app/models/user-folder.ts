@@ -1,5 +1,8 @@
 export class UserFolder {
     constructor(
-        public name: string
+        public id: string,
+        public name: string,
+        public size: number,
+        public lastModified: number
     ) {}
 }
