@@ -26,5 +26,10 @@ namespace FilesApp.DAL
             return arr.ToList();
         }
 
+        public string? GetFolderId(string folder)
+        {
+            return _folders.Where(f => f.Name == folder).Select(f => f.Id).FirstOrDefault();
+        }
+
     }
 }

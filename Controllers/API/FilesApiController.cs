@@ -86,6 +86,10 @@ namespace FilesApp.Controllers
                         IsTopLevel = !foundTopLevelFolder
                     });
                 }
+                else 
+                {
+                    folderId = _foldersStorage.GetFolderId(folder);
+                }
                 if (!foundTopLevelFolder)
                 {
                     foundTopLevelFolder = true;
