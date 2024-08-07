@@ -39,7 +39,7 @@ namespace FilesApp.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFiles(List<IFormFile> files, [FromForm] Dictionary<string, string> lastModified, [FromForm] Dictionary<string, string> paths)
+        public async Task<IActionResult> UploadFiles(List<IFormFile> files, [FromForm] Dictionary<string, string> lastModified)
         {
             if (files == null || files.Count == 0)
             {
@@ -49,8 +49,7 @@ namespace FilesApp.Controllers
             for (int i = 0; i < files.Count; i++)
             {
                 var lastModifiedKey = $"lastModified_{i}";
-                var pathKey = $"paths_{i}";
-                string? folderId = paths.ContainsKey(pathKey) ? SaveFolders(paths[pathKey]) : null;
+                string? folderId =  SaveFolders(files[i].FileName);
 
                 using (var memoryStream = files[i].OpenReadStream())
                 {
@@ -72,7 +71,7 @@ namespace FilesApp.Controllers
 
         private string? SaveFolders(string path)
         {
-            if (string.IsNullOrWhiteSpace(path))
+            if (string.IsNullOrWhiteSpace(path) || !path.Contains("/"))
             {
                 return null;
             }
@@ -84,13 +83,14 @@ namespace FilesApp.Controllers
             {
                 if (!_foldersStorage.Exists(folder))
                 {
-                    folderId = Guid.NewGuid().ToString();
+                    var newFolderId = Guid.NewGuid().ToString();
                     _foldersStorage.Add(new Folder
                     {
-                        Id = folderId,
+                        Id = newFolderId,
                         Name = folder,
-                        IsTopLevel = !foundTopLevelFolder
+                        FolderId = folderId
                     });
+                    folderId = newFolderId;
                 }
                 else 
                 {

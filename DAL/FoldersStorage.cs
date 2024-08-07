@@ -19,7 +19,7 @@ namespace FilesApp.DAL
 
         public List<Folder> GetTopLevelFolders()
         {
-            var matches = _folders.Where(f => f.IsTopLevel).ToList();
+            var matches = _folders.Where(f => f.FolderId == null).ToList();
             Folder[] arr = new Folder[matches.Count];
             matches.CopyTo(arr);
 
@@ -32,6 +32,15 @@ namespace FilesApp.DAL
         }
 
         public Folder? Get(string folderId) => _folders.Where(f => f.Id == folderId).FirstOrDefault();
+
+        public List<Folder> GetByFolder(string folderId) 
+        {
+            var matches = _folders.Where(f => f.FolderId == folderId).ToList();
+            Folder[] arr = new Folder[matches.Count];
+            matches.CopyTo(arr);
+
+            return arr.ToList();
+        }
 
     }
 }

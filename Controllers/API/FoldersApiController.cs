@@ -25,9 +25,10 @@ namespace FilesApp.Controllers
         public async Task<IActionResult> GetFolderData(string id)
         {
             var folder = _foldersStorage.Get(id);
+            var subfolders = _foldersStorage.GetByFolder(folder.Id);
             var files = _filesStorage.GetFolderFiles(id);
 
-            return Ok(new { folder, files });
+            return Ok(new { folder, subfolders, files });
         }
 
 

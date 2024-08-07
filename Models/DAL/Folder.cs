@@ -12,7 +12,7 @@ namespace FilesApp.Models.DAL
 
         public string Name { get; init; }
 
-        [JsonIgnore]
-        public bool IsTopLevel { get; set; }
+        public string? FolderId { get; init; }
+
     }
 }

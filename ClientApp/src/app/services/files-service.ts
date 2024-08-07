@@ -21,7 +21,6 @@ export class FilesHttpService {
 
         for (let i = 0; i < files.length; i++) {
             formData.append('files', files[i]);
-            formData.append(`lastModified_${i}`, files[i].lastModified.toString());
             formData.append(`paths_${i}`, files[i].webkitRelativePath);
         }
 

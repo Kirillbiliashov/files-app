@@ -33,17 +33,8 @@ export class HomeComponent implements OnInit {
   loadFiles() {
     this.filesService.getFiles()
       .subscribe(data => {
-        console.log(data)
         this.data = data;
       });
   }
-
-  // getFolderSize(group: GroupedFiles) {
-  //   return group.files.map(f => f.length).reduce((a, b) => a + b, 0);
-  // }
-
-  // getFolderModified(group: GroupedFiles) {
-  //   return group.files.map(f => f.modified).reduce((a, b) => a > b? a : b);
-  // }
 
 }
