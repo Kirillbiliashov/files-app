@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FilesApp.DAL;
+using FilesApp.Models.DAL;
+using FilesApp.Models.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FilesApp.Controllers
@@ -29,6 +31,20 @@ namespace FilesApp.Controllers
             var files = _filesStorage.GetFolderFiles(id);
 
             return Ok(new { folder, subfolders, files });
+        }
+
+        [HttpPost("")]
+        public async Task<IActionResult> CreateNewFolder([FromBody] CreateFolderBody body)
+        {
+            var newFolder = new Folder 
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = body.Name,
+                FolderId = body.FolderId
+            };
+            _foldersStorage.Add(newFolder);
+
+            return Created($"api/folders/{newFolder.Id}", new { folderId = newFolder.Id });
         }
 
 

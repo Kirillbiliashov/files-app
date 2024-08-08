@@ -42,5 +42,10 @@ namespace FilesApp.DAL
             return arr.ToList();
         }
 
+        public void SaveFolder(Folder folder) 
+        {
+            _folders.Add(folder);
+        }
+
     }
 }
