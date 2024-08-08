@@ -17,11 +17,9 @@ export class FilesHttpService {
     uploadFiles(files: FileList) {
         const formData = new FormData();
 
-        let folderName = null;
-
         for (let i = 0; i < files.length; i++) {
             formData.append('files', files[i]);
-            formData.append(`paths_${i}`, files[i].webkitRelativePath);
+            formData.append(`lastModified_${i}`, files[i].lastModified.toString());
         }
 
         return this.client.post('api/files/upload', formData)

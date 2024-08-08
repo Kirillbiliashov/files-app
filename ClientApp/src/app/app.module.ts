@@ -10,6 +10,7 @@ import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { FolderComponent } from './folder/folder.component';
+import { FilesTableComponent } from './files-table/files-table.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { FolderComponent } from './folder/folder.component';
     HomeComponent,
     CounterComponent,
     FetchDataComponent,
-    FolderComponent
+    FolderComponent,
+    FilesTableComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
