@@ -36,10 +36,12 @@ namespace FilesApp.Controllers
         [HttpPost("")]
         public async Task<IActionResult> CreateNewFolder([FromBody] CreateFolderBody body)
         {
+            var foldersCount = _foldersStorage.FoldersCount(body.Name);
+            var folderName = foldersCount > 0 ? $"{body.Name} ({foldersCount})" : body.Name;
             var newFolder = new Folder 
             {
                 Id = Guid.NewGuid().ToString(),
-                Name = body.Name,
+                Name = folderName,
                 FolderId = body.FolderId
             };
             _foldersStorage.Add(newFolder);

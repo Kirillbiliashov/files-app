@@ -12,6 +12,27 @@ namespace FilesApp.DAL
 
         public bool Exists(string folder) => _folders.Any(f => f.Name == folder);
 
+        public int FoldersCount(string folder)
+        {
+
+            var directMatchCount = _folders.Where(f => f.Name == folder).Count();
+
+            var patternMatchesCount = _folders.Where(f =>
+             {
+                 var splitName = f.Name.Split(" ");
+                 if (splitName.Count() != 2) return false;
+
+                 var lastPart = splitName.Last();
+                 if (!lastPart.StartsWith("(") || !lastPart.EndsWith(")")) return false;
+                 lastPart = lastPart.Trim('(').Trim(')');
+
+                 if (!int.TryParse(lastPart, out int _)) return false;
+                 return true;
+             }).Count();
+
+             return directMatchCount + patternMatchesCount;
+        }
+
         public void Add(Folder folder)
         {
             _folders.Add(folder);
@@ -33,7 +54,7 @@ namespace FilesApp.DAL
 
         public Folder? Get(string folderId) => _folders.Where(f => f.Id == folderId).FirstOrDefault();
 
-        public List<Folder> GetByFolder(string folderId) 
+        public List<Folder> GetByFolder(string folderId)
         {
             var matches = _folders.Where(f => f.FolderId == folderId).ToList();
             Folder[] arr = new Folder[matches.Count];
@@ -42,7 +63,7 @@ namespace FilesApp.DAL
             return arr.ToList();
         }
 
-        public void SaveFolder(Folder folder) 
+        public void SaveFolder(Folder folder)
         {
             _folders.Add(folder);
         }
