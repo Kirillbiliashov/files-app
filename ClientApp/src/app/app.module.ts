@@ -11,6 +11,7 @@ import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { FolderComponent } from './folder/folder.component';
 import { FilesTableComponent } from './files-table/files-table.component';
+import { FilesActionsComponent } from './files-actions/files-actions.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { FilesTableComponent } from './files-table/files-table.component';
     CounterComponent,
     FetchDataComponent,
     FolderComponent,
-    FilesTableComponent
+    FilesTableComponent,
+    FilesActionsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
