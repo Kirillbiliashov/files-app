@@ -34,6 +34,16 @@ namespace FilesApp.DAL
             return arr.ToList();
         }
 
+
+        public List<UserFile> GetFilesByIds(List<string> ids)
+        {
+            var matches = _files.Where(f => ids.Contains(f.Id)).ToList();
+            UserFile[] arr = new UserFile[matches.Count];
+            matches.CopyTo(arr);
+
+            return arr.ToList();
+        }
+
         public List<UserFile> GetFolderFiles(string folderId)
         {
             var matches = _files.Where(f => f.FolderId == folderId).ToList();

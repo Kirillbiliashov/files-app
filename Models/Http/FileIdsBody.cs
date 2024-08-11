@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FilesApp.Models.Http
 {
-    public class DeleteFilesBody
+    public class FileIdsBody
     {
         public List<string> files { get; init; }
     }

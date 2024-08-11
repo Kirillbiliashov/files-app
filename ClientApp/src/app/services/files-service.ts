@@ -26,10 +26,16 @@ export class FilesHttpService {
     }
 
     deleteFiles(fileIds: string[]) {
-        const body = {
-            files: fileIds
-        }
-
+        const body = { files: fileIds }
         return this.client.post('api/files/delete', body);
+    }
+
+    downloadFiles(fileIds: string[]) {
+        const body = { files: fileIds }
+        const httpOptions = {
+            responseType: 'blob' as const
+        };
+
+        return this.client.post('api/files/download', body, httpOptions);
     }
 }
