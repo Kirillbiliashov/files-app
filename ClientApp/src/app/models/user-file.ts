@@ -3,7 +3,8 @@ export class UserFile {
         public id: string,
         public filename: string,
         public length: number,
-        public modified: number
+        public modified: number,
+        public isHovered: boolean = false
     ) { }
 
 }

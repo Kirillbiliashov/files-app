@@ -2,7 +2,7 @@
 
 <h3 style="margin-top: 50px">All files</h3>
 <ng-container *ngIf="data">
-  <app-files-table [files]="data.files" [folders]="data.folders"></app-files-table>
+  <app-files-table [files]="data.files" [folders]="data.folders" (onFilesChange)="loadFiles()"></app-files-table>
 
 </ng-container>
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
+using FilesApp.Models.Http;
 using Microsoft.AspNetCore.Mvc;
 using MimeMapping;
 
@@ -29,13 +30,17 @@ namespace FilesApp.Controllers
             var files = _filesStorage.GetTopLevelFiles();
             var folders = _foldersStorage.GetTopLevelFolders();
 
-            return Ok(new { files, folders = folders.Select(f => new
+            return Ok(new
             {
-                f.Id,
-                f.Name,
-                size = _filesStorage.GetFolderSize(f.Id),
-                lastModified = _filesStorage.GetFolderLastModified(f.Id)
-            }) });
+                files,
+                folders = folders.Select(f => new
+                {
+                    f.Id,
+                    f.Name,
+                    size = _filesStorage.GetFolderSize(f.Id),
+                    lastModified = _filesStorage.GetFolderLastModified(f.Id)
+                })
+            });
         }
 
         [HttpPost("upload")]
@@ -49,7 +54,7 @@ namespace FilesApp.Controllers
             for (int i = 0; i < files.Count; i++)
             {
                 var lastModifiedKey = $"lastModified_{i}";
-                string? folderId =  SaveFolders(files[i].FileName);
+                string? folderId = SaveFolders(files[i].FileName);
 
                 using (var memoryStream = files[i].OpenReadStream())
                 {
@@ -92,7 +97,7 @@ namespace FilesApp.Controllers
                     });
                     folderId = newFolderId;
                 }
-                else 
+                else
                 {
                     folderId = _foldersStorage.GetFolderId(folder);
                 }
@@ -120,5 +125,13 @@ namespace FilesApp.Controllers
 
             return File(file.Content, contentType);
         }
+
+        [HttpPost("delete")]
+        public async Task<IActionResult> DeleteFiles([FromBody] DeleteFilesBody body)
+        {
+            var count = _filesStorage.RemoveFiles(body.files);
+            return Ok(new { deletedCount = count });
+        }
+
     }
 }

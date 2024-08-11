@@ -24,4 +24,12 @@ export class FilesHttpService {
 
         return this.client.post('api/files/upload', formData)
     }
+
+    deleteFiles(fileIds: string[]) {
+        const body = {
+            files: fileIds
+        }
+
+        return this.client.post('api/files/delete', body);
+    }
 }
