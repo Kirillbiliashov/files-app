@@ -14,9 +14,10 @@ export class FilesTableComponent {
   @Output() onFilesChange = new EventEmitter();
 
   lastHoverIdx: number = -1;
+  headerHovered: boolean = false;
   selectedFileIds: string[] = [];
 
-  constructor(private filesService: FilesHttpService) {}
+  constructor(private filesService: FilesHttpService) { }
 
   changeFilesSelection(checked: boolean, file: UserFile) {
     if (checked) {
@@ -29,10 +30,17 @@ export class FilesTableComponent {
     }
   }
 
+  changeAllFilesSelection(checked: boolean) {
+    this.selectedFileIds = [];
+    if (checked) {
+      this.files.forEach(f => this.selectedFileIds.push(f.id));
+    }
+  }
+
   selectSingleRow(event: Event, fileId: string) {
     console.log('selectSingleRow')
     event.stopPropagation();
-    this.selectedFileIds = []; 
+    this.selectedFileIds = [];
     this.selectedFileIds.push(fileId);
   }
 
@@ -58,7 +66,7 @@ export class FilesTableComponent {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url); // Clean up memo
       },
-      error: () => {}
+      error: () => { }
     });
   }
 
