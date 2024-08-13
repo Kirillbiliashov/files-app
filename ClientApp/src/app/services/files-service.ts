@@ -15,8 +15,12 @@ export class FilesHttpService {
         return this.client.get<FileData>('api/files')
     }
 
-    uploadFiles(files: FileList) {
+    uploadFiles(files: FileList, folder: string | null = null) {
         const formData = new FormData();
+
+        if (folder) {
+            formData.append('folder', folder)
+        }
 
         for (let i = 0; i < files.length; i++) {
             formData.append('files', files[i]);

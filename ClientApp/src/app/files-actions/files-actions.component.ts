@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FilesHttpService } from '../services/files-service';
 import { FoldersHttpService } from '../services/folders-service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-files-actions',
@@ -15,13 +15,15 @@ export class FilesActionsComponent {
 
   constructor(private filesService: FilesHttpService, 
     private foldersService: FoldersHttpService, 
-    private router: Router) { }
+    private router: Router,
+    private route: ActivatedRoute) { }
 
   uploadFile(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
-
-      this.filesService.uploadFiles(input.files)
+      const routeSnaphot = this.route.snapshot;
+      const folder = routeSnaphot.routeConfig?.path == "folders/:id" ? routeSnaphot.paramMap.get('id') : null;
+      this.filesService.uploadFiles(input.files, folder)
         .subscribe(_ => this.onFileUpload.emit())
     }
   }

@@ -45,7 +45,7 @@ namespace FilesApp.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFiles(List<IFormFile> files, [FromForm] Dictionary<string, string> lastModified)
+        public async Task<IActionResult> UploadFiles(List<IFormFile> files, [FromForm] Dictionary<string, string> lastModified, [FromForm] string? folder)
         {
             if (files == null || files.Count == 0)
             {
@@ -55,7 +55,7 @@ namespace FilesApp.Controllers
             for (int i = 0; i < files.Count; i++)
             {
                 var lastModifiedKey = $"lastModified_{i}";
-                string? folderId = SaveFolders(files[i].FileName);
+                string? folderId = folder != null ? folder : SaveFolders(files[i].FileName);
 
                 using (var memoryStream = files[i].OpenReadStream())
                 {
