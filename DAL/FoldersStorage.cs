@@ -68,5 +68,7 @@ namespace FilesApp.DAL
             _folders.Add(folder);
         }
 
+        public int Remove(List<string> ids) => _folders.RemoveAll(f => ids.Contains(f.Id));
+
     }
 }

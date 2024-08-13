@@ -127,36 +127,5 @@ namespace FilesApp.Controllers
             return File(file.Content, contentType);
         }
 
-        [HttpPost("delete")]
-        public async Task<IActionResult> DeleteFiles([FromBody] FileIdsBody body)
-        {
-            var count = _filesStorage.RemoveFiles(body.files);
-            return Ok(new { deletedCount = count });
-        }
-
-        [HttpPost("download")]
-        public async Task<IActionResult> DownoadFiles([FromBody] FileIdsBody body)
-        {
-            var files = _filesStorage.GetFilesByIds(body.files);
-
-            using (var ms = new MemoryStream())
-            {
-                using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, true))
-                {
-                    foreach (var file in files)
-                    {
-                        var entry = archive.CreateEntry(file.Filename, CompressionLevel.Fastest);
-                        using (var zipStream = entry.Open())
-                        {
-                            zipStream.Write(file.Content, 0, file.Content.Length);
-                        }
-                    }
-                }
-
-                return File(ms.ToArray(), "application/zip", "files.zip");
-            }
-
-        }
-
     }
 }

@@ -2,6 +2,8 @@ import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { UserFolder } from '../models/user-folder';
 import { UserFile } from '../models/user-file';
 import { FilesHttpService } from '../services/files-service';
+import { SelectedItem } from '../models/selected-item';
+import { ItemsHttpService } from '../services/items-service';
 
 @Component({
   selector: 'app-files-table',
@@ -15,39 +17,41 @@ export class FilesTableComponent {
 
   lastHoverIdx: number = -1;
   headerHovered: boolean = false;
-  selectedFileIds: string[] = [];
+  selectedTableItems: SelectedItem[] = [];
 
-  constructor(private filesService: FilesHttpService) { }
+  constructor(private filesService: FilesHttpService, private itemsService: ItemsHttpService) { }
 
-  changeFilesSelection(checked: boolean, file: UserFile) {
+  changeSelection(checked: boolean, type: string, id: string) {
     if (checked) {
-      this.selectedFileIds.push(file.id);
+      this.selectedTableItems.push(new SelectedItem(type, id));
     } else {
-      const idx = this.selectedFileIds.indexOf(file.id);
+      const idx = this.selectedTableItems.findIndex(i => i.id == id && i.type == type)
       if (idx > -1) {
-        this.selectedFileIds.splice(idx, 1);
+        this.selectedTableItems.splice(idx, 1);
       }
     }
   }
 
+  rowSelected = (id: string) => this.selectedTableItems.some(i => i.id == id);
+
   changeAllFilesSelection(checked: boolean) {
-    this.selectedFileIds = [];
+    this.selectedTableItems = [];
     if (checked) {
-      this.files.forEach(f => this.selectedFileIds.push(f.id));
+      this.folders.forEach(f => this.selectedTableItems.push(new SelectedItem("folder", f.id)));
+      this.files.forEach(f => this.selectedTableItems.push(new SelectedItem("file", f.id)));
     }
   }
 
-  selectSingleRow(event: Event, fileId: string) {
-    console.log('selectSingleRow')
+  selectSingleRow(event: Event, type: string, id: string) {
     event.stopPropagation();
-    this.selectedFileIds = [];
-    this.selectedFileIds.push(fileId);
+    this.selectedTableItems = [];
+    this.selectedTableItems.push(new SelectedItem(type, id));
   }
 
   deleteFiles() {
-    this.filesService.deleteFiles(this.selectedFileIds).subscribe({
+    this.itemsService.deleteItems(this.selectedTableItems).subscribe({
       next: () => {
-        this.selectedFileIds = [];
+        this.selectedTableItems = [];
         this.onFilesChange.emit();
       },
       error: () => console.log('error')
@@ -55,16 +59,16 @@ export class FilesTableComponent {
   }
 
   downloadFiles() {
-    this.filesService.downloadFiles(this.selectedFileIds).subscribe({
+    this.itemsService.downloadItems(this.selectedTableItems).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'files.zip'; // The name of the downloaded ZIP file
+        a.download = 'files.zip'; 
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        window.URL.revokeObjectURL(url); // Clean up memo
+        window.URL.revokeObjectURL(url); 
       },
       error: () => { }
     });

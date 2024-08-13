@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { UserFile } from "../models/user-file";
 import { FileData } from "../models/file-data";
+import { SelectedItem } from "../models/selected-item";
 
 @Injectable({
     providedIn: 'root'
@@ -23,19 +24,5 @@ export class FilesHttpService {
         }
 
         return this.client.post('api/files/upload', formData)
-    }
-
-    deleteFiles(fileIds: string[]) {
-        const body = { files: fileIds }
-        return this.client.post('api/files/delete', body);
-    }
-
-    downloadFiles(fileIds: string[]) {
-        const body = { files: fileIds }
-        const httpOptions = {
-            responseType: 'blob' as const
-        };
-
-        return this.client.post('api/files/download', body, httpOptions);
     }
 }

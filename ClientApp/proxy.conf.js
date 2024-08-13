@@ -8,7 +8,8 @@ const PROXY_CONFIG = [
     context: [
       "/weatherforecast",
       "/api/files",
-      "/api/folders"
+      "/api/folders",
+      "/api/items"
    ],
     proxyTimeout: 10000,
     target: target,

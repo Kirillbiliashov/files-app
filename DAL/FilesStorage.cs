@@ -53,11 +53,22 @@ namespace FilesApp.DAL
             return arr.ToList();
         }
 
+        public List<UserFile> GetFoldersFiles(List<string> folderIds)
+        {
+            var matches = _files.Where(f => f.FolderId != null && folderIds.Contains(f.FolderId)).ToList();
+            UserFile[] arr = new UserFile[matches.Count];
+            matches.CopyTo(arr);
+
+            return arr.ToList();
+        }
+
         public long GetFolderSize(string folderId) => _files.Where(f => f.FolderId == folderId).Sum(f => f.Length);
 
         public long? GetFolderLastModified(string folderId) => _files.Where(f => f.FolderId == folderId).MaxBy(f => f.Modified)?.Modified;
 
         public int RemoveFiles(List<string> ids) => _files.RemoveAll(f => ids.Contains(f.Id));
+
+        public int RemoveFilesByFolder(List<string> folderIds) => _files.RemoveAll(f => f.FolderId != null && folderIds.Contains(f.FolderId));
         
     }
 }
