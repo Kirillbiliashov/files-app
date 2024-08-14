@@ -11,19 +11,21 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class FilesActionsComponent {
   @Output() onFileUpload = new EventEmitter();
   folderName: string = "";
+  folderId: string | null = null;
 
 
-  constructor(private filesService: FilesHttpService, 
-    private foldersService: FoldersHttpService, 
+  constructor(private filesService: FilesHttpService,
+    private foldersService: FoldersHttpService,
     private router: Router,
-    private route: ActivatedRoute) { }
+    private route: ActivatedRoute) {
+    const routeSnaphot = this.route.snapshot;
+    this.folderId = routeSnaphot.routeConfig?.path == "folders/:id" ? routeSnaphot.paramMap.get('id') : null;
+  }
 
   uploadFile(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
-      const routeSnaphot = this.route.snapshot;
-      const folder = routeSnaphot.routeConfig?.path == "folders/:id" ? routeSnaphot.paramMap.get('id') : null;
-      this.filesService.uploadFiles(input.files, folder)
+      this.filesService.uploadFiles(input.files, this.folderId)
         .subscribe(_ => this.onFileUpload.emit())
     }
   }
@@ -33,7 +35,7 @@ export class FilesActionsComponent {
   }
 
   createFolder() {
-    this.foldersService.createFolder(this.folderName, null).subscribe(res => {
+    this.foldersService.createFolder(this.folderName, this.folderId).subscribe(res => {
       if (res.folderId) {
         this.router.navigate(['/folders', res.folderId]);
       }

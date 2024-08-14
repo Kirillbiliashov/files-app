@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace FilesApp.Models.DAL
 {
-    public class Folder
+    public class Folder: Item
     {
-        public string Id { get; init; }
-
-        public string Name { get; init; }
-
-        public string? FolderId { get; init; }
 
     }
 }

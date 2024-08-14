@@ -6,21 +6,13 @@ using System.Threading.Tasks;
 
 namespace FilesApp.Models.DAL
 {
-    public class UserFile
+    public class UserFile: Item
     {
-        public string Id { get; init; }
+        public long Size { get; init; }
 
-        public string Filename { get; init; }
-
-         public string? Folder { get; init; }
-
-        public long Length { get; init; }
-
-        public long Modified { get; init; }
+        public long LastModified { get; init; }
 
         [JsonIgnore]
         public byte[] Content { get; init; }
-
-        public string? FolderId { get; init; }
     }
 }

@@ -4,6 +4,7 @@ import { UserFile } from '../models/user-file';
 import { FilesHttpService } from '../services/files-service';
 import { SelectedItem } from '../models/selected-item';
 import { ItemsHttpService } from '../services/items-service';
+import { Item } from '../models/item';
 
 @Component({
   selector: 'app-files-table',
@@ -64,15 +65,28 @@ export class FilesTableComponent {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'files.zip'; 
+        a.download = 'files.zip';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        window.URL.revokeObjectURL(url); 
+        window.URL.revokeObjectURL(url);
       },
       error: () => { }
     });
   }
 
+  changeStarredState(item: Item, type: string) {
+    const selectedItem = new SelectedItem(type, item.id);
+    console.log('clicked')
+    if (item.isStarred) {
+      this.itemsService.unstarItem(selectedItem).subscribe({
+        next: () => item.isStarred = false
+      });
+    } else {
+      this.itemsService.starItem(selectedItem).subscribe({
+        next: () => item.isStarred = true
+      });
+    }
+  }
 
 }

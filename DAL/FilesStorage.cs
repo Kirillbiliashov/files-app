@@ -62,9 +62,9 @@ namespace FilesApp.DAL
             return arr.ToList();
         }
 
-        public long GetFolderSize(string folderId) => _files.Where(f => f.FolderId == folderId).Sum(f => f.Length);
+        public long GetFolderSize(string folderId) => _files.Where(f => f.FolderId == folderId).Sum(f => f.Size);
 
-        public long? GetFolderLastModified(string folderId) => _files.Where(f => f.FolderId == folderId).MaxBy(f => f.Modified)?.Modified;
+        public long? GetFolderLastModified(string folderId) => _files.Where(f => f.FolderId == folderId).MaxBy(f => f.LastModified)?.LastModified;
 
         public int RemoveFiles(List<string> ids) => _files.RemoveAll(f => ids.Contains(f.Id));
 

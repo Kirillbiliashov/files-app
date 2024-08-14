@@ -6,7 +6,7 @@ import { SelectedItem } from "../models/selected-item";
     providedIn: 'root'
 })
 export class ItemsHttpService {
-    constructor(private client: HttpClient) {}
+    constructor(private client: HttpClient) { }
 
     deleteItems(items: SelectedItem[]) {
         const body = { items }
@@ -20,6 +20,14 @@ export class ItemsHttpService {
         };
 
         return this.client.post('api/items/download', body, httpOptions);
+    }
+
+    starItem(item: SelectedItem) {
+        return this.client.patch('api/items/star', item);
+    }
+
+    unstarItem(item: SelectedItem) {
+        return this.client.patch('api/items/unstar', item);
     }
 
 }

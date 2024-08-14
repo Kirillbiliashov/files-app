@@ -1,10 +1,15 @@
-export class UserFile {
+import { Item } from "./item";
+
+export class UserFile extends Item {
     constructor(
         public id: string,
-        public filename: string,
-        public length: number,
-        public modified: number,
-        public isHovered: boolean = false
-    ) { }
+        public name: string,
+        public size: number,
+        public lastModified: number,
+        public isHovered: boolean = false,
+        public isStarred: boolean
+    ) {
+        super();
+    }
 
 }

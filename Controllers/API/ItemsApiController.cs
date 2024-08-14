@@ -97,7 +97,7 @@ namespace FilesApp.Controllers.API
                 {
                     foreach (var file in files)
                     {
-                        var entry = archive.CreateEntry(file.Filename, CompressionLevel.Fastest);
+                        var entry = archive.CreateEntry(file.Name, CompressionLevel.Fastest);
                         using (var zipStream = entry.Open())
                         {
                             zipStream.Write(file.Content, 0, file.Content.Length);
@@ -108,6 +108,52 @@ namespace FilesApp.Controllers.API
                 return File(ms.ToArray(), "application/zip", "files.zip");
             }
 
+        }
+
+        [HttpPatch("star")]
+        public async Task<IActionResult> StarItem([FromBody] SelectedItem body)
+        {
+            if (body.Type == "file")
+            {
+                var file = _filesStorage.Get(body.Id);
+                if (file != null)
+                {
+                    file.IsStarred = true;
+                }
+            }
+            else if (body.Type == "folder")
+            {
+                var folder = _foldersStorage.Get(body.Id);
+                if (folder != null)
+                {
+                    folder.IsStarred = true;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpPatch("unstar")]
+        public async Task<IActionResult> UnstarItem([FromBody] SelectedItem body)
+        {
+            if (body.Type == "file")
+            {
+                var file = _filesStorage.Get(body.Id);
+                if (file != null)
+                {
+                    file.IsStarred = false;
+                }
+            }
+            else if (body.Type == "folder")
+            {
+                var folder = _foldersStorage.Get(body.Id);
+                if (folder != null)
+                {
+                    folder.IsStarred = false;
+                }
+            }
+
+            return NoContent();
         }
     }
 }

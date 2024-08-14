@@ -15,7 +15,6 @@ namespace FilesApp.Controllers
     [Route("api/files")]
     public class FilesApiController : ControllerBase
     {
-
         private readonly FilesStorage _filesStorage;
         private readonly FoldersStorage _foldersStorage;
 
@@ -39,7 +38,8 @@ namespace FilesApp.Controllers
                     f.Id,
                     f.Name,
                     size = _filesStorage.GetFolderSize(f.Id),
-                    lastModified = _filesStorage.GetFolderLastModified(f.Id)
+                    lastModified = _filesStorage.GetFolderLastModified(f.Id),
+                    f.IsStarred
                 })
             });
         }
@@ -64,9 +64,9 @@ namespace FilesApp.Controllers
                     _filesStorage.Add(new UserFile
                     {
                         Id = Guid.NewGuid().ToString(),
-                        Filename = files[i].FileName.Split("/").Last(),
-                        Length = files[i].Length,
-                        Modified = long.Parse(lastModified[lastModifiedKey]),
+                        Name = files[i].FileName.Split("/").Last(),
+                        Size = files[i].Length,
+                        LastModified = long.Parse(lastModified[lastModifiedKey]),
                         Content = buffer,
                         FolderId = folderId
                     });
@@ -121,8 +121,8 @@ namespace FilesApp.Controllers
                 return NotFound();
             }
 
-            Response.Headers.Add("Content-Disposition", "inline; filename=" + file.Filename);
-            string contentType = MimeUtility.GetMimeMapping(file.Filename);
+            Response.Headers.Add("Content-Disposition", "inline; filename=" + file.Name);
+            string contentType = MimeUtility.GetMimeMapping(file.Name);
 
             return File(file.Content, contentType);
         }
