@@ -19,6 +19,7 @@ export class FilesTableComponent {
   lastHoverIdx: number = -1;
   headerHovered: boolean = false;
   selectedTableItems: SelectedItem[] = [];
+  showStarredOnly: boolean = false;
 
   constructor(private filesService: FilesHttpService, private itemsService: ItemsHttpService) { }
 
