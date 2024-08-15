@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using FilesApp.Controllers.API;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
@@ -13,15 +14,10 @@ namespace FilesApp.Controllers
 {
     [ApiController]
     [Route("api/files")]
-    public class FilesApiController : ControllerBase
+    public class FilesApiController : BaseApiController
     {
-        private readonly FilesStorage _filesStorage;
-        private readonly FoldersStorage _foldersStorage;
-
-        public FilesApiController(FilesStorage filesStorage, FoldersStorage foldersStorage)
+        public FilesApiController(FilesStorage filesStorage, FoldersStorage foldersStorage) : base(filesStorage, foldersStorage)
         {
-            _filesStorage = filesStorage;
-            _foldersStorage = foldersStorage;
         }
 
         [HttpGet("")]
@@ -42,20 +38,6 @@ namespace FilesApp.Controllers
                     f.IsStarred
                 })
             });
-        }
-
-
-        private long GetFolderSize(string folderId)
-        {
-            var filesSize = _filesStorage.GetFolderSize(folderId);
-            var subFolders = _foldersStorage.GetByFolder(folderId);
-
-            if (subFolders.Count == 0)
-            {
-                return filesSize;
-            }
-
-            return filesSize + subFolders.Select(sf => GetFolderSize(sf.Id)).Sum();
         }
 
         [HttpPost("upload")]

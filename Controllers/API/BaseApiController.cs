@@ -31,5 +31,25 @@ namespace FilesApp.Controllers.API
 
             return filesSize + subFolders.Select(sf => GetFolderSize(sf.Id)).Sum();
         }
+
+        protected long? GetFolderLastModified(string folderId)
+        {
+            var filesLastModified = _filesStorage.GetFolderLastModified(folderId);
+            var subFolders = _foldersStorage.GetByFolder(folderId);
+
+            if (subFolders.Count == 0)
+            {
+                return filesLastModified;
+            }
+
+            var subfoldersLastModified = subFolders.Select(sf => GetFolderLastModified(sf.Id)).Max();
+
+            if (filesLastModified == null || subfoldersLastModified == null)
+            {
+                return null;
+            }
+
+            return Math.Max((long)filesLastModified, (long)subfoldersLastModified);
+        }
     }
 }

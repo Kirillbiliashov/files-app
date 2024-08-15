@@ -34,7 +34,7 @@ namespace FilesApp.Controllers
                     f.Id,
                     f.Name,
                     size = GetFolderSize(f.Id),
-                    lastModified = _filesStorage.GetFolderLastModified(f.Id),
+                    lastModified = GetFolderLastModified(f.Id),
                     f.IsStarred
                 }),
                 files
