@@ -55,7 +55,9 @@ namespace FilesApp.Controllers
             for (int i = 0; i < files.Count; i++)
             {
                 var lastModifiedKey = $"lastModified_{i}";
-                string? folderId = folder != null ? folder : SaveFolders(files[i].FileName);
+                var folderName = folder != null ?  _foldersStorage.Get(folder)?.Name : null;
+                var filename = folderName != null ? $"{folderName}/{files[i].FileName}" : files[i].FileName;
+                string? folderId = SaveFolders(filename);
 
                 using (var memoryStream = files[i].OpenReadStream())
                 {
@@ -129,3 +131,6 @@ namespace FilesApp.Controllers
 
     }
 }
+
+//1. folder create should nest selected folder into the active folder
+//2. 
