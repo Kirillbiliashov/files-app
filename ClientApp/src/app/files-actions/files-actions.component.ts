@@ -38,6 +38,7 @@ export class FilesActionsComponent {
   createFolder() {
     this.foldersService.createFolder(this.folderName, this.folderId).subscribe(res => {
       if (res.folderId) {
+        this.folderName = "";
         this.router.navigate(['/folders', res.folderId]);
       }
     })

@@ -37,11 +37,25 @@ namespace FilesApp.Controllers
                 {
                     f.Id,
                     f.Name,
-                    size = _filesStorage.GetFolderSize(f.Id),
+                    size = GetFolderSize(f.Id),
                     lastModified = _filesStorage.GetFolderLastModified(f.Id),
                     f.IsStarred
                 })
             });
+        }
+
+
+        private long GetFolderSize(string folderId)
+        {
+            var filesSize = _filesStorage.GetFolderSize(folderId);
+            var subFolders = _foldersStorage.GetByFolder(folderId);
+
+            if (subFolders.Count == 0)
+            {
+                return filesSize;
+            }
+
+            return filesSize + subFolders.Select(sf => GetFolderSize(sf.Id)).Sum();
         }
 
         [HttpPost("upload")]
@@ -131,6 +145,3 @@ namespace FilesApp.Controllers
 
     }
 }
-
-//1. folder create should nest selected folder into the active folder
-//2. 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FilesApp.Controllers.API;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
@@ -12,15 +13,10 @@ namespace FilesApp.Controllers
 
     [ApiController]
     [Route("api/folders")]
-    public class FoldersApiController : ControllerBase
+    public class FoldersApiController : BaseApiController
     {
-        private readonly FilesStorage _filesStorage;
-        private readonly FoldersStorage _foldersStorage;
-
-        public FoldersApiController(FilesStorage filesStorage, FoldersStorage foldersStorage)
+        public FoldersApiController(FilesStorage filesStorage, FoldersStorage foldersStorage) : base(filesStorage, foldersStorage)
         {
-            _filesStorage = filesStorage;
-            _foldersStorage = foldersStorage;
         }
 
         [HttpGet("{id}")]
@@ -30,7 +26,19 @@ namespace FilesApp.Controllers
             var subfolders = _foldersStorage.GetByFolder(folder.Id);
             var files = _filesStorage.GetFolderFiles(id);
 
-            return Ok(new { folder, subfolders, files });
+            return Ok(new
+            {
+                folder,
+                subfolders = subfolders.Select(f => new
+                {
+                    f.Id,
+                    f.Name,
+                    size = GetFolderSize(f.Id),
+                    lastModified = _filesStorage.GetFolderLastModified(f.Id),
+                    f.IsStarred
+                }),
+                files
+            });
         }
 
         [HttpPost("")]
@@ -38,7 +46,7 @@ namespace FilesApp.Controllers
         {
             var foldersCount = _foldersStorage.FoldersCount(body.Name);
             var folderName = foldersCount > 0 ? $"{body.Name} ({foldersCount})" : body.Name;
-            var newFolder = new Folder 
+            var newFolder = new Folder
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = folderName,
