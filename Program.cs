@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using FilesApp.DAL;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,13 +6,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+.AddJsonOptions(x =>
+   x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 builder.Services.AddSingleton<FilesStorage>();
 builder.Services.AddSingleton<FoldersStorage>();
 
-builder.Services.AddDbContext<FilesAppDbContext>(o => 
-    o.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
+builder.Services.AddDbContext<FilesAppDbContext>(o =>
+    o.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"))
+    .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
+    .EnableSensitiveDataLogging()
+    .EnableDetailedErrors());
 
 var app = builder.Build();
 

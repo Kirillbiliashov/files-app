@@ -25,12 +25,11 @@ namespace FilesApp.Controllers
         [HttpGet("")]
         public async Task<IActionResult> GetAllFiles()
         {
-            var items = _context.Items.ToList();
-
+            var items = _context.Items.Where(i => i.FolderId == null).ToList();
             return Ok(new
             {
                 files = items.OfType<UserFile>().ToList(),
-                folders = items.OfType<Folder>().ToList(),
+                folders = items.OfType<Folder>().ToList()
             });
         }
 
@@ -82,7 +81,6 @@ namespace FilesApp.Controllers
 
             string? folderId = null;
             var parts = path.Split("/");
-            var foundTopLevelFolder = false;
             parts.SkipLast(1).ToList().ForEach(folderName =>
             {
                 if (!_context.Items.OfType<Folder>().Any(i => i.Name == folderName))
@@ -93,19 +91,17 @@ namespace FilesApp.Controllers
                         FolderId = folderId
                     };
                     _context.Items.Add(folder);
+                    _context.SaveChanges();
                     folderId = folder.Id;
                 }
                 else
                 {
+                    
                     folderId = _context.Items
                     .OfType<Folder>()
                     .Where(f => f.Name == folderName)
-                    .Select(f => f.FolderId)
+                    .Select(f => f.Id)
                     .FirstOrDefault();
-                }
-                if (!foundTopLevelFolder)
-                {
-                    foundTopLevelFolder = true;
                 }
             });
 
