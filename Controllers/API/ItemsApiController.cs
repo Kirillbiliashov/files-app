@@ -7,6 +7,7 @@ using FilesApp.DAL;
 using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FilesApp.Controllers.API
 {
@@ -16,29 +17,40 @@ namespace FilesApp.Controllers.API
     {
         private readonly FilesStorage _filesStorage;
         private readonly FoldersStorage _foldersStorage;
+        private readonly FilesAppDbContext _context;
 
-        public ItemsApiController(FilesStorage filesStorage, FoldersStorage foldersStorage)
+        public ItemsApiController(FilesStorage filesStorage, FoldersStorage foldersStorage, FilesAppDbContext context)
         {
             _filesStorage = filesStorage;
             _foldersStorage = foldersStorage;
+            _context = context;
         }
 
         [HttpPost("delete")]
         public async Task<IActionResult> DeleteItems([FromBody] SelectedItemsBody body)
         {
             var groupedItems = body.Items.GroupBy(i => i.Type);
-            var deletedCount = 0;
             foreach (var group in groupedItems)
             {
                 if (group.Key == "file")
                 {
-                    deletedCount += _filesStorage.RemoveFiles(group.Select(g => g.Id).ToList());
+                    foreach (var item in group)
+                    {
+                        var fileToDelete = new UserFile { Id = item.Id };
+                        _context.Entry(fileToDelete).State = EntityState.Deleted;
+                    }
                 }
                 else if (group.Key == "folder")
                 {
-                    deletedCount += DeleteFolderContents(group.Select(g => g.Id).ToList());
+                    foreach (var item in group)
+                    {
+                        var folderToDelete = new Folder { Id = item.Id };
+                        _context.Entry(folderToDelete).State = EntityState.Deleted;
+                    }
                 }
             }
+
+            var deletedCount = await _context.SaveChangesAsync();
 
             return Ok(new { deletedCount });
         }
@@ -78,16 +90,19 @@ namespace FilesApp.Controllers.API
             var groupedItems = body.Items.GroupBy(i => i.Type);
             foreach (var group in groupedItems)
             {
+                var ids = group.Select(g => g.Id).ToList();
                 if (group.Key == "file")
                 {
-                    files.AddRange(_filesStorage.GetFilesByIds(group.Select(g => g.Id).ToList()));
+                    var dbFiles = _context.Items.OfType<UserFile>().Where(f => ids.Contains(f.Id)).ToList();
+                    files.AddRange(dbFiles);
                 }
                 else if (group.Key == "folder")
                 {
-                    var folderIds = group.Select(g => g.Id).ToList();
-                    var accumulator = folderIds.ToList();
-                    GetNestedFolderIds(folderIds, accumulator);
-                    files.AddRange(_filesStorage.GetFoldersFiles(accumulator));
+                    // var folderIds = group.Select(g => g.Id).ToList();
+                    // var accumulator = folderIds.ToList();
+                    // GetNestedFolderIds(folderIds, accumulator);
+                    var dbFiles = _context.Items.OfType<UserFile>().Where(f => f.FolderId != null && ids.Contains(f.FolderId)).ToList();
+                    files.AddRange(dbFiles);
                 }
             }
 
@@ -113,22 +128,12 @@ namespace FilesApp.Controllers.API
         [HttpPatch("star")]
         public async Task<IActionResult> StarItem([FromBody] SelectedItem body)
         {
-            if (body.Type == "file")
-            {
-                var file = _filesStorage.Get(body.Id);
-                if (file != null)
-                {
-                    file.IsStarred = true;
-                }
-            }
-            else if (body.Type == "folder")
-            {
-                var folder = _foldersStorage.Get(body.Id);
-                if (folder != null)
-                {
-                    folder.IsStarred = true;
-                }
-            }
+            Item item = body.Type == "file" ? new UserFile { Id = body.Id } : new Folder { Id = body.Id };
+            _context.Items.Attach(item);
+            item.IsStarred = true;
+            _context.Entry(item).Property(x => x.Name).IsModified = true;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -136,22 +141,12 @@ namespace FilesApp.Controllers.API
         [HttpPatch("unstar")]
         public async Task<IActionResult> UnstarItem([FromBody] SelectedItem body)
         {
-            if (body.Type == "file")
-            {
-                var file = _filesStorage.Get(body.Id);
-                if (file != null)
-                {
-                    file.IsStarred = false;
-                }
-            }
-            else if (body.Type == "folder")
-            {
-                var folder = _foldersStorage.Get(body.Id);
-                if (folder != null)
-                {
-                    folder.IsStarred = false;
-                }
-            }
+            Item item = body.Type == "file" ? new UserFile { Id = body.Id } : new Folder { Id = body.Id };
+            _context.Items.Attach(item);
+            item.IsStarred = false;
+            _context.Entry(item).Property(x => x.Name).IsModified = true;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

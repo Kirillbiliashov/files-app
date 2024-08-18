@@ -16,27 +16,21 @@ namespace FilesApp.Controllers
     [Route("api/files")]
     public class FilesApiController : BaseApiController
     {
-        public FilesApiController(FilesStorage filesStorage, FoldersStorage foldersStorage) : base(filesStorage, foldersStorage)
+        private readonly FilesAppDbContext _context;
+        public FilesApiController(FilesStorage filesStorage, FoldersStorage foldersStorage, FilesAppDbContext context) : base(filesStorage, foldersStorage)
         {
+            _context = context;
         }
 
         [HttpGet("")]
         public async Task<IActionResult> GetAllFiles()
         {
-            var files = _filesStorage.GetTopLevelFiles();
-            var folders = _foldersStorage.GetTopLevelFolders();
+            var items = _context.Items.ToList();
 
             return Ok(new
             {
-                files,
-                folders = folders.Select(f => new
-                {
-                    f.Id,
-                    f.Name,
-                    size = GetFolderSize(f.Id),
-                    lastModified = _filesStorage.GetFolderLastModified(f.Id),
-                    f.IsStarred
-                })
+                files = items.OfType<UserFile>().ToList(),
+                folders = items.OfType<Folder>().ToList(),
             });
         }
 
@@ -51,7 +45,12 @@ namespace FilesApp.Controllers
             for (int i = 0; i < files.Count; i++)
             {
                 var lastModifiedKey = $"lastModified_{i}";
-                var folderName = folder != null ?  _foldersStorage.Get(folder)?.Name : null;
+                var folderName = folder != null ?  _context.Items
+                .OfType<Folder>()
+                .Where(f => f.Id == folder)
+                .Select(f => f.Name)
+                .FirstOrDefault() : null;
+
                 var filename = folderName != null ? $"{folderName}/{files[i].FileName}" : files[i].FileName;
                 string? folderId = SaveFolders(filename);
 
@@ -59,9 +58,8 @@ namespace FilesApp.Controllers
                 {
                     byte[] buffer = new byte[memoryStream.Length];
                     memoryStream.Read(buffer, 0, buffer.Length);
-                    _filesStorage.Add(new UserFile
+                    _context.Items.Add(new UserFile
                     {
-                        Id = Guid.NewGuid().ToString(),
                         Name = files[i].FileName.Split("/").Last(),
                         Size = files[i].Length,
                         LastModified = long.Parse(lastModified[lastModifiedKey]),
@@ -70,6 +68,8 @@ namespace FilesApp.Controllers
                     });
                 }
             }
+            await _context.SaveChangesAsync();
+
             return Ok();
         }
 
@@ -83,22 +83,25 @@ namespace FilesApp.Controllers
             string? folderId = null;
             var parts = path.Split("/");
             var foundTopLevelFolder = false;
-            parts.SkipLast(1).ToList().ForEach(folder =>
+            parts.SkipLast(1).ToList().ForEach(folderName =>
             {
-                if (!_foldersStorage.Exists(folder))
+                if (!_context.Items.OfType<Folder>().Any(i => i.Name == folderName))
                 {
-                    var newFolderId = Guid.NewGuid().ToString();
-                    _foldersStorage.Add(new Folder
+                    var folder = new Folder
                     {
-                        Id = newFolderId,
-                        Name = folder,
+                        Name = folderName,
                         FolderId = folderId
-                    });
-                    folderId = newFolderId;
+                    };
+                    _context.Items.Add(folder);
+                    folderId = folder.Id;
                 }
                 else
                 {
-                    folderId = _foldersStorage.GetFolderId(folder);
+                    folderId = _context.Items
+                    .OfType<Folder>()
+                    .Where(f => f.Name == folderName)
+                    .Select(f => f.FolderId)
+                    .FirstOrDefault();
                 }
                 if (!foundTopLevelFolder)
                 {
@@ -112,7 +115,7 @@ namespace FilesApp.Controllers
         [HttpGet("open/{id}")]
         public async Task<IActionResult> OpenFile(string id)
         {
-            var file = _filesStorage.Get(id);
+            var file = _context.Items.OfType<UserFile>().Where(f => f.Id == id).FirstOrDefault();
 
             if (file == null)
             {

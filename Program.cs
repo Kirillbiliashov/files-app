@@ -1,4 +1,5 @@
 using FilesApp.DAL;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,9 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<FilesStorage>();
 builder.Services.AddSingleton<FoldersStorage>();
+
+builder.Services.AddDbContext<FilesAppDbContext>(o => 
+    o.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 
 var app = builder.Build();
 
