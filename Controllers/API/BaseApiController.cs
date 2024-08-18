@@ -3,53 +3,70 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FilesApp.DAL;
+using FilesApp.Models.DAL;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FilesApp.Controllers.API
 {
     public class BaseApiController : ControllerBase
     {
+        protected readonly FilesAppDbContext _context;
 
-        protected readonly FilesStorage _filesStorage;
-        protected readonly FoldersStorage _foldersStorage;
-
-        public BaseApiController(FilesStorage filesStorage, FoldersStorage foldersStorage)
-        {
-            _filesStorage = filesStorage;
-            _foldersStorage = foldersStorage;
-        }
+        public BaseApiController(FilesAppDbContext context) => _context = context;
 
         protected long GetFolderSize(string folderId)
         {
-            var filesSize = _filesStorage.GetFolderSize(folderId);
-            var subFolders = _foldersStorage.GetByFolder(folderId);
-
-            if (subFolders.Count == 0)
+            if (folderId == null)
             {
-                return filesSize;
+                return 0;
             }
 
-            return filesSize + subFolders.Select(sf => GetFolderSize(sf.Id)).Sum();
+            var filesSize = _context.Items
+            .Where(i => i.FolderId == folderId)
+            .OfType<UserFile>()
+            .Select(i => i.Size)
+            .Sum();
+
+            var subfoldersIds = _context.Items
+            .Where(i => i.FolderId == folderId)
+            .OfType<Folder>()
+            .Select(i => i.Id)
+            .ToList();
+
+            return filesSize + subfoldersIds.Select(GetFolderSize).Sum();
         }
 
         protected long? GetFolderLastModified(string folderId)
         {
-            var filesLastModified = _filesStorage.GetFolderLastModified(folderId);
-            var subFolders = _foldersStorage.GetByFolder(folderId);
-
-            if (subFolders.Count == 0)
-            {
-                return filesLastModified;
-            }
-
-            var subfoldersLastModified = subFolders.Select(sf => GetFolderLastModified(sf.Id)).Max();
-
-            if (filesLastModified == null || subfoldersLastModified == null)
+           if (folderId == null)
             {
                 return null;
             }
 
-            return Math.Max((long)filesLastModified, (long)subfoldersLastModified);
+            var filesLastModified = _context.Items
+            .Where(i => i.FolderId == folderId)
+            .OfType<UserFile>()
+            .Select(i => i.LastModified)
+            .Max();
+            
+            var subfoldersIds = _context.Items
+            .Where(i => i.FolderId == folderId)
+            .OfType<Folder>()
+            .Select(i => i.Id)
+            .ToList();
+
+            if (subfoldersIds.Count == 0)
+            {
+                return filesLastModified;
+            }
+
+            var subfoldersLastModified = subfoldersIds.Select(GetFolderLastModified).Max();
+            if (filesLastModified == 0 || subfoldersLastModified == null)
+            {
+                return null;
+            }
+
+            return Math.Max(filesLastModified, (long) subfoldersLastModified);
         }
     }
 }

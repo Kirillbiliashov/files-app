@@ -86,10 +86,7 @@ namespace FilesApp.Controllers.API
                 }
                 else if (group.Key == "folder")
                 {
-                    // var folderIds = group.Select(g => g.Id).ToList();
-                    // var accumulator = folderIds.ToList();
-                    // GetNestedFolderIds(folderIds, accumulator);
-                    var dbFiles = _context.Items.OfType<UserFile>().Where(f => f.FolderId != null && ids.Contains(f.FolderId)).ToList();
+                    var dbFiles = GetNestedFolderItems(ids);
                     files.AddRange(dbFiles);
                 }
             }
@@ -113,10 +110,27 @@ namespace FilesApp.Controllers.API
 
         }
 
+        private List<UserFile> GetNestedFolderItems(IEnumerable<string> folderIds)
+        {
+            if (folderIds == null || folderIds.Count() == 0)
+            {
+                return new List<UserFile>();
+            }
+
+            var nestedItems = _context.Items
+            .Where(i => i.FolderId != null && folderIds.Contains(i.FolderId))
+            .ToList();
+
+            return nestedItems
+            .OfType<UserFile>()
+            .Concat(GetNestedFolderItems(nestedItems.OfType<Folder>().Select(f => f.Id)))
+            .ToList();
+        }
+
         [HttpPatch("star")]
         public async Task<IActionResult> StarItem([FromBody] SelectedItem body)
         {
-            Item item = body.Type == "file" ? new UserFile { Id = body.Id } : new Folder { Id = body.Id };
+            Item item = new Item { Id = body.Id };
             _context.Items.Attach(item);
             item.IsStarred = true;
             _context.Entry(item).Property(x => x.IsStarred).IsModified = true;
@@ -129,7 +143,7 @@ namespace FilesApp.Controllers.API
         [HttpPatch("unstar")]
         public async Task<IActionResult> UnstarItem([FromBody] SelectedItem body)
         {
-            Item item = body.Type == "file" ? new UserFile { Id = body.Id } : new Folder { Id = body.Id };
+            var item = new Item { Id = body.Id };
             _context.Items.Attach(item);
             item.IsStarred = false;
             _context.Entry(item).Property(x => x.IsStarred).IsModified = true;

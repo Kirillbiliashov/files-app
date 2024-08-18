@@ -16,10 +16,8 @@ namespace FilesApp.Controllers
     [Route("api/files")]
     public class FilesApiController : BaseApiController
     {
-        private readonly FilesAppDbContext _context;
-        public FilesApiController(FilesStorage filesStorage, FoldersStorage foldersStorage, FilesAppDbContext context) : base(filesStorage, foldersStorage)
+        public FilesApiController(FilesAppDbContext context) : base(context)
         {
-            _context = context;
         }
 
         [HttpGet("")]
@@ -29,7 +27,14 @@ namespace FilesApp.Controllers
             return Ok(new
             {
                 files = items.OfType<UserFile>().ToList(),
-                folders = items.OfType<Folder>().ToList()
+                folders = items.OfType<Folder>().ToList().Select(f => new
+                {
+                    f.Id,
+                    f.Name,
+                    size = GetFolderSize(f.Id),
+                    lastModified = GetFolderLastModified(f.Id),
+                    f.IsStarred
+                })
             });
         }
 
