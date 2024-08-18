@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FilesApp.Models.DAL
 {
-    public abstract class Item
+    public class Item
     {
         public string Id { get; init; } = Guid.NewGuid().ToString();
 

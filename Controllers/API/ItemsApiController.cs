@@ -15,14 +15,11 @@ namespace FilesApp.Controllers.API
     [Route("api/items")]
     public class ItemsApiController : ControllerBase
     {
-        private readonly FilesStorage _filesStorage;
-        private readonly FoldersStorage _foldersStorage;
+
         private readonly FilesAppDbContext _context;
 
-        public ItemsApiController(FilesStorage filesStorage, FoldersStorage foldersStorage, FilesAppDbContext context)
+        public ItemsApiController(FilesAppDbContext context)
         {
-            _filesStorage = filesStorage;
-            _foldersStorage = foldersStorage;
             _context = context;
         }
 
@@ -42,6 +39,7 @@ namespace FilesApp.Controllers.API
                 }
                 else if (group.Key == "folder")
                 {
+                    DeleteNestedFolderItems(group.Select(g => g.Id));
                     foreach (var item in group)
                     {
                         var folderToDelete = new Folder { Id = item.Id };
@@ -55,31 +53,21 @@ namespace FilesApp.Controllers.API
             return Ok(new { deletedCount });
         }
 
-        private int DeleteFolderContents(List<string> folderIds)
+        private void DeleteNestedFolderItems(IEnumerable<string> folderIds)
         {
-            var accumulator = folderIds.ToList();
-            GetNestedFolderIds(folderIds, accumulator);
-
-            var foldersCount = _foldersStorage.Remove(accumulator);
-            var filesCount = _filesStorage.RemoveFilesByFolder(accumulator);
-
-            return foldersCount + filesCount;
-        }
-
-        private void GetNestedFolderIds(List<string> folders, List<string> accumulator)
-        {
-            folders.ForEach(f =>
+            if (folderIds == null || folderIds.Count() == 0)
             {
-                var subfolders = _foldersStorage.GetByFolder(f);
-                if (subfolders != null)
-                {
-                    subfolders.ForEach(sf =>
-                    {
-                        accumulator.Add(sf.Id);
-                        GetNestedFolderIds(new List<string> { sf.Id }, accumulator);
-                    });
-                }
-            });
+                return;
+            }
+
+            var nestedItems = _context.Items
+            .Where(i => i.FolderId != null && folderIds.Contains(i.FolderId))
+            .Select(i => new Item { Id = i.Id, FolderId = i.FolderId })
+            .ToList();
+
+            DeleteNestedFolderItems(nestedItems.Select(i => i.Id));
+            nestedItems.ForEach(i => _context.Entry(i).State = EntityState.Deleted);
+            _context.SaveChanges();
         }
 
         [HttpPost("download")]
@@ -131,7 +119,7 @@ namespace FilesApp.Controllers.API
             Item item = body.Type == "file" ? new UserFile { Id = body.Id } : new Folder { Id = body.Id };
             _context.Items.Attach(item);
             item.IsStarred = true;
-            _context.Entry(item).Property(x => x.Name).IsModified = true;
+            _context.Entry(item).Property(x => x.IsStarred).IsModified = true;
 
             await _context.SaveChangesAsync();
 
@@ -144,7 +132,7 @@ namespace FilesApp.Controllers.API
             Item item = body.Type == "file" ? new UserFile { Id = body.Id } : new Folder { Id = body.Id };
             _context.Items.Attach(item);
             item.IsStarred = false;
-            _context.Entry(item).Property(x => x.Name).IsModified = true;
+            _context.Entry(item).Property(x => x.IsStarred).IsModified = true;
 
             await _context.SaveChangesAsync();
 

@@ -18,11 +18,6 @@ namespace FilesApp.DAL
         {
             modelBuilder.Entity<UserFile>();
             modelBuilder.Entity<Folder>();
-
-            // modelBuilder.Entity<Item>()
-            // .HasOne(i => i.Folder) 
-            // .WithMany() 
-            // .HasForeignKey(i => i.FolderId); 
         }
 
     }

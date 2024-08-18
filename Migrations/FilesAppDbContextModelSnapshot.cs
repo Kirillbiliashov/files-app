@@ -78,10 +78,16 @@ namespace FilesApp.Migrations
             modelBuilder.Entity("FilesApp.Models.DAL.Item", b =>
                 {
                     b.HasOne("FilesApp.Models.DAL.Folder", "Folder")
-                        .WithMany()
-                        .HasForeignKey("FolderId");
+                        .WithMany("Items")
+                        .HasForeignKey("FolderId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Folder");
+                });
+
+            modelBuilder.Entity("FilesApp.Models.DAL.Folder", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }
