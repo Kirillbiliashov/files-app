@@ -49,7 +49,7 @@ namespace FilesApp.Controllers
             for (int i = 0; i < files.Count; i++)
             {
                 var lastModifiedKey = $"lastModified_{i}";
-                var folderName = folder != null ?  _context.Items
+                var folderName = folder != null ? _context.Items
                 .OfType<Folder>()
                 .Where(f => f.Id == folder)
                 .Select(f => f.Name)
@@ -86,9 +86,15 @@ namespace FilesApp.Controllers
 
             string? folderId = null;
             var parts = path.Split("/");
-            parts.SkipLast(1).ToList().ForEach(folderName =>
+            var folderPaths = parts.SkipLast(1).ToList();
+
+            folderPaths.ForEach(folderName =>
             {
-                if (!_context.Items.OfType<Folder>().Any(i => i.Name == folderName))
+                var isFolderAdded = _context.ChangeTracker.Entries<Folder>()
+                .Where(f => f.Entity.Name == folderName)
+                .Any();
+
+                if (!(isFolderAdded || _context.Items.OfType<Folder>().Any(i => i.Name == folderName)))
                 {
                     var folder = new Folder
                     {
@@ -96,14 +102,15 @@ namespace FilesApp.Controllers
                         FolderId = folderId
                     };
                     _context.Items.Add(folder);
-                    _context.SaveChanges();
                     folderId = folder.Id;
                 }
                 else
                 {
-                    
-                    folderId = _context.Items
-                    .OfType<Folder>()
+                    var folders = isFolderAdded ?
+                    _context.ChangeTracker.Entries<Folder>().Select(e => e.Entity) :
+                    _context.Items.OfType<Folder>();
+
+                    folderId = folders
                     .Where(f => f.Name == folderName)
                     .Select(f => f.Id)
                     .FirstOrDefault();
@@ -116,7 +123,11 @@ namespace FilesApp.Controllers
         [HttpGet("open/{id}")]
         public async Task<IActionResult> OpenFile(string id)
         {
-            var file = _context.Items.OfType<UserFile>().Where(f => f.Id == id).FirstOrDefault();
+            var file = _context.Items
+            .OfType<UserFile>()
+            .Where(f => f.Id == id)
+            .Select(f => new UserFile { Name = f.Name, Content = f.Content })
+            .FirstOrDefault();
 
             if (file == null)
             {

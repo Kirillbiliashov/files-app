@@ -13,14 +13,11 @@ namespace FilesApp.Controllers.API
 {
     [ApiController]
     [Route("api/items")]
-    public class ItemsApiController : ControllerBase
+    public class ItemsApiController : BaseApiController
     {
 
-        private readonly FilesAppDbContext _context;
-
-        public ItemsApiController(FilesAppDbContext context)
+        public ItemsApiController(FilesAppDbContext context): base(context)
         {
-            _context = context;
         }
 
         [HttpPost("delete")]
@@ -67,7 +64,6 @@ namespace FilesApp.Controllers.API
 
             DeleteNestedFolderItems(nestedItems.Select(i => i.Id));
             nestedItems.ForEach(i => _context.Entry(i).State = EntityState.Deleted);
-            _context.SaveChanges();
         }
 
         [HttpPost("download")]
