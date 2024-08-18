@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace FilesApp.Controllers.API
 {
@@ -12,61 +15,113 @@ namespace FilesApp.Controllers.API
     {
         protected readonly FilesAppDbContext _context;
 
+        private const string _folderSizeQuery = @"
+        WITH RecursiveFolders AS (
+        SELECT Id, FolderId, Size
+        FROM Items
+        WHERE Id = @FolderId
+    
+        UNION ALL
+    
+        SELECT i.Id, i.FolderId, i.Size
+        FROM Items i
+        INNER JOIN RecursiveFolders rf ON i.FolderId = rf.Id
+        )
+
+        SELECT SUM(Size) AS TotalSize FROM RecursiveFolders;
+        ";
+
+        private const string _folderModifiedQuery = @"
+        WITH RecursiveFolders AS (
+        SELECT Id, FolderId, LastModified
+        FROM Items
+        WHERE Id = @FolderId
+    
+        UNION ALL
+    
+        SELECT i.Id, i.FolderId, i.LastModified
+        FROM Items i
+        INNER JOIN RecursiveFolders rf ON i.FolderId = rf.Id
+        )
+
+        SELECT MAX(LastModified) AS LastModified FROM RecursiveFolders;
+        ";
+
         public BaseApiController(FilesAppDbContext context) => _context = context;
 
         protected long GetFolderSize(string folderId)
         {
-            if (folderId == null)
+            var conn = _context.Database.GetDbConnection();
+            DbDataReader reader = null;
+            try
             {
-                return 0;
+                conn.Open();
+                using (var command = conn.CreateCommand())
+                {
+                    command.CommandText = _folderSizeQuery;
+                    var folderIdParam = command.CreateParameter();
+                    folderIdParam.ParameterName = "@FolderId";
+                    folderIdParam.Value = folderId;
+                    command.Parameters.Add(folderIdParam);
+                    reader = command.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            return reader.GetInt64(0);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (reader != null)
+                {
+                    reader.DisposeAsync();
+                }
+                conn.Close();
             }
 
-            var filesSize = _context.Items
-            .Where(i => i.FolderId == folderId)
-            .OfType<UserFile>()
-            .Select(i => i.Size)
-            .Sum();
-
-            var subfoldersIds = _context.Items
-            .Where(i => i.FolderId == folderId)
-            .OfType<Folder>()
-            .Select(i => i.Id)
-            .ToList();
-
-            return filesSize + subfoldersIds.Select(GetFolderSize).Sum();
+            return 0;
         }
 
         protected long? GetFolderLastModified(string folderId)
         {
-           if (folderId == null)
+            var conn = _context.Database.GetDbConnection();
+            DbDataReader reader = null;
+            try
             {
-                return null;
+                conn.Open();
+                using (var command = conn.CreateCommand())
+                {
+                    command.CommandText = _folderModifiedQuery;
+                    var folderIdParam = command.CreateParameter();
+                    folderIdParam.ParameterName = "@FolderId";
+                    folderIdParam.Value = folderId;
+                    command.Parameters.Add(folderIdParam);
+                    reader = command.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            return reader.GetInt64(0);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (reader != null)
+                {
+                    reader.DisposeAsync();
+                }
+                conn.Close();
             }
 
-            var filesLastModified = _context.Items
-            .Where(i => i.FolderId == folderId)
-            .OfType<UserFile>()
-            .Select(i => i.LastModified)
-            .Max();
-            
-            var subfoldersIds = _context.Items
-            .Where(i => i.FolderId == folderId)
-            .OfType<Folder>()
-            .Select(i => i.Id)
-            .ToList();
+            return null;
 
-            if (subfoldersIds.Count == 0)
-            {
-                return filesLastModified;
-            }
-
-            var subfoldersLastModified = subfoldersIds.Select(GetFolderLastModified).Max();
-            if (filesLastModified == 0 || subfoldersLastModified == null)
-            {
-                return null;
-            }
-
-            return Math.Max(filesLastModified, (long) subfoldersLastModified);
         }
     }
 }
