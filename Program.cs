@@ -10,9 +10,6 @@ builder.Services.AddControllersWithViews()
 .AddJsonOptions(x =>
    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-builder.Services.AddSingleton<FilesStorage>();
-builder.Services.AddSingleton<FoldersStorage>();
-
 builder.Services.AddDbContext<FilesAppDbContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"))
     .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
