@@ -8,6 +8,7 @@ using FilesApp.DAL;
 using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MimeMapping;
 
 namespace FilesApp.Controllers
@@ -16,6 +17,7 @@ namespace FilesApp.Controllers
     [Route("api/files")]
     public class FilesApiController : BaseApiController
     {
+        private const string _allFilesQuery = "SELECT Id, Discriminator, FolderId, IsStarred, Name, NULL AS Content, LastModified, Size FROM Items WHERE FolderId IS NULL";
         public FilesApiController(FilesAppDbContext context) : base(context)
         {
         }
@@ -23,7 +25,8 @@ namespace FilesApp.Controllers
         [HttpGet("")]
         public async Task<IActionResult> GetAllFiles()
         {
-            var items = _context.Items.Where(i => i.FolderId == null).ToList();
+            var items = _context.Items.FromSqlRaw(_allFilesQuery).ToList();
+
             return Ok(new
             {
                 files = items.OfType<UserFile>().ToList(),

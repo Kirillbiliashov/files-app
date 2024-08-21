@@ -8,11 +8,11 @@ namespace FilesApp.Models.DAL
 {
     public class UserFile: Item
     {
-        public long Size { get; init; }
+        public long Size { get; set; }
 
-        public long LastModified { get; init; }
+        public long LastModified { get; set; }
 
         [JsonIgnore]
-        public byte[] Content { get; init; }
+        public byte[] Content { get; set; }
     }
 }

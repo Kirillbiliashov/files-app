@@ -9,12 +9,12 @@ namespace FilesApp.Models.DAL
     {
         public string Id { get; init; } = Guid.NewGuid().ToString();
 
-        public string Name { get; init; }
+        public string Name { get; set; }
 
-        public string? FolderId { get; init; }
+        public string? FolderId { get; set; }
 
         public bool IsStarred { get; set; }
 
-        public Folder? Folder { get; init; }
+        public Folder? Folder { get; set; }
     }
 }
