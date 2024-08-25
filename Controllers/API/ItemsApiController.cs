@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
+using FilesApp.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,11 +14,16 @@ namespace FilesApp.Controllers.API
 {
     [ApiController]
     [Route("api/items")]
-    public class ItemsApiController : BaseApiController
+    public class ItemsApiController : ControllerBase
     {
 
-        public ItemsApiController(FilesAppDbContext context): base(context)
+        private readonly IItemsRepository _itemsRepository;
+        private readonly IFilesRepository _filesRepository;
+
+        public ItemsApiController(IItemsRepository itemsRepository, IFilesRepository filesRepository)
         {
+            _itemsRepository = itemsRepository;
+            _filesRepository = filesRepository;
         }
 
         [HttpPost("delete")]
@@ -30,8 +36,7 @@ namespace FilesApp.Controllers.API
                 {
                     foreach (var item in group)
                     {
-                        var fileToDelete = new UserFile { Id = item.Id };
-                        _context.Entry(fileToDelete).State = EntityState.Deleted;
+                        _itemsRepository.Delete(new UserFile { Id = item.Id });
                     }
                 }
                 else if (group.Key == "folder")
@@ -39,13 +44,12 @@ namespace FilesApp.Controllers.API
                     DeleteNestedFolderItems(group.Select(g => g.Id));
                     foreach (var item in group)
                     {
-                        var folderToDelete = new Folder { Id = item.Id };
-                        _context.Entry(folderToDelete).State = EntityState.Deleted;
+                        _itemsRepository.Delete(new Folder { Id = item.Id });
                     }
                 }
             }
 
-            var deletedCount = await _context.SaveChangesAsync();
+            var deletedCount = await _itemsRepository.SaveAsync();
 
             return Ok(new { deletedCount });
         }
@@ -57,13 +61,9 @@ namespace FilesApp.Controllers.API
                 return;
             }
 
-            var nestedItems = _context.Items
-            .Where(i => i.FolderId != null && folderIds.Contains(i.FolderId))
-            .Select(i => new Item { Id = i.Id, FolderId = i.FolderId })
-            .ToList();
-
+            var nestedItems = _itemsRepository.GetByFolderIds(folderIds);
             DeleteNestedFolderItems(nestedItems.Select(i => i.Id));
-            nestedItems.ForEach(i => _context.Entry(i).State = EntityState.Deleted);
+            _itemsRepository.DeleteMany(nestedItems);
         }
 
         [HttpPost("download")]
@@ -77,7 +77,7 @@ namespace FilesApp.Controllers.API
                 var ids = group.Select(g => g.Id).ToList();
                 if (group.Key == "file")
                 {
-                    var dbFiles = _context.Items.OfType<UserFile>().Where(f => ids.Contains(f.Id)).ToList();
+                    var dbFiles = _filesRepository.GetAll(ids);
                     files.AddRange(dbFiles);
                 }
                 else if (group.Key == "folder")
@@ -113,9 +113,7 @@ namespace FilesApp.Controllers.API
                 return new List<UserFile>();
             }
 
-            var nestedItems = _context.Items
-            .Where(i => i.FolderId != null && folderIds.Contains(i.FolderId))
-            .ToList();
+            var nestedItems = _itemsRepository.GetAllByFolderIds(folderIds);
 
             return nestedItems
             .OfType<UserFile>()
@@ -127,11 +125,8 @@ namespace FilesApp.Controllers.API
         public async Task<IActionResult> StarItem([FromBody] SelectedItem body)
         {
             Item item = new Item { Id = body.Id };
-            _context.Items.Attach(item);
-            item.IsStarred = true;
-            _context.Entry(item).Property(x => x.IsStarred).IsModified = true;
-
-            await _context.SaveChangesAsync();
+            _itemsRepository.Update(item, i => i.IsStarred, true);
+            await _itemsRepository.SaveAsync();
 
             return NoContent();
         }
@@ -140,11 +135,8 @@ namespace FilesApp.Controllers.API
         public async Task<IActionResult> UnstarItem([FromBody] SelectedItem body)
         {
             var item = new Item { Id = body.Id };
-            _context.Items.Attach(item);
-            item.IsStarred = false;
-            _context.Entry(item).Property(x => x.IsStarred).IsModified = true;
-
-            await _context.SaveChangesAsync();
+            _itemsRepository.Update(item, i => i.IsStarred, false);
+            await _itemsRepository.SaveAsync();
 
             return NoContent();
         }

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using FilesApp.DAL;
+using FilesApp.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,10 @@ builder.Services.AddDbContext<FilesAppDbContext>(o =>
     .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
     .EnableSensitiveDataLogging()
     .EnableDetailedErrors());
+
+builder.Services.AddScoped<IFilesRepository, FilesRepository>();
+builder.Services.AddScoped<IFoldersRepository, FoldersRepository>();
+builder.Services.AddScoped<IItemsRepository, ItemsRepository>();
 
 var app = builder.Build();
 

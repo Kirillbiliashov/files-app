@@ -7,6 +7,7 @@ using FilesApp.Controllers.API;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
+using FilesApp.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MimeMapping;
@@ -15,17 +16,24 @@ namespace FilesApp.Controllers
 {
     [ApiController]
     [Route("api/files")]
-    public class FilesApiController : BaseApiController
+    public class FilesApiController : ControllerBase
     {
-        private const string _allFilesQuery = "SELECT Id, Discriminator, FolderId, IsStarred, Name, NULL AS Content, LastModified, Size FROM Items WHERE FolderId IS NULL";
-        public FilesApiController(FilesAppDbContext context) : base(context)
+
+        private readonly IItemsRepository _itemsRepository;
+        private readonly IFoldersRepository _foldersRepository;
+        private readonly IFilesRepository _filesRepository;
+
+        public FilesApiController(IItemsRepository itemsRepository, IFoldersRepository foldersRepository, IFilesRepository filesRepository)
         {
+            _itemsRepository = itemsRepository;
+            _foldersRepository = foldersRepository;
+            _filesRepository = filesRepository;
         }
 
         [HttpGet("")]
         public async Task<IActionResult> GetAllFiles()
         {
-            var items = _context.Items.FromSqlRaw(_allFilesQuery).ToList();
+            var items = _itemsRepository.GetTopLevelItems();
 
             return Ok(new
             {
@@ -34,8 +42,8 @@ namespace FilesApp.Controllers
                 {
                     f.Id,
                     f.Name,
-                    size = GetFolderSize(f.Id),
-                    lastModified = GetFolderLastModified(f.Id),
+                    size = _foldersRepository.GetSize(f.Id),
+                    lastModified = _foldersRepository.GetLastModified(f.Id),
                     f.IsStarred
                 })
             });
@@ -49,14 +57,11 @@ namespace FilesApp.Controllers
                 return BadRequest();
             }
 
+            var folderName = folder != null ? _foldersRepository.GetFolderName(folder) : null;
+
             for (int i = 0; i < files.Count; i++)
             {
                 var lastModifiedKey = $"lastModified_{i}";
-                var folderName = folder != null ? _context.Items
-                .OfType<Folder>()
-                .Where(f => f.Id == folder)
-                .Select(f => f.Name)
-                .FirstOrDefault() : null;
 
                 var filename = folderName != null ? $"{folderName}/{files[i].FileName}" : files[i].FileName;
                 string? folderId = SaveFolders(filename);
@@ -65,7 +70,7 @@ namespace FilesApp.Controllers
                 {
                     byte[] buffer = new byte[memoryStream.Length];
                     memoryStream.Read(buffer, 0, buffer.Length);
-                    _context.Items.Add(new UserFile
+                    _itemsRepository.Add(new UserFile
                     {
                         Name = files[i].FileName.Split("/").Last(),
                         Size = files[i].Length,
@@ -75,7 +80,7 @@ namespace FilesApp.Controllers
                     });
                 }
             }
-            await _context.SaveChangesAsync();
+            await _itemsRepository.SaveAsync();
 
             return Ok();
         }
@@ -93,30 +98,21 @@ namespace FilesApp.Controllers
 
             folderPaths.ForEach(folderName =>
             {
-                var isFolderAdded = _context.ChangeTracker.Entries<Folder>()
-                .Where(f => f.Entity.Name == folderName)
-                .Any();
+                var isFolderAdded = _foldersRepository.IsTrackedByName(folderName);
 
-                if (!(isFolderAdded || _context.Items.OfType<Folder>().Any(i => i.Name == folderName)))
+                if (!(isFolderAdded || _foldersRepository.ExistsByName(folderName)))
                 {
                     var folder = new Folder
                     {
                         Name = folderName,
                         FolderId = folderId
                     };
-                    _context.Items.Add(folder);
+                    _itemsRepository.Add(folder);
                     folderId = folder.Id;
                 }
                 else
                 {
-                    var folders = isFolderAdded ?
-                    _context.ChangeTracker.Entries<Folder>().Select(e => e.Entity) :
-                    _context.Items.OfType<Folder>();
-
-                    folderId = folders
-                    .Where(f => f.Name == folderName)
-                    .Select(f => f.Id)
-                    .FirstOrDefault();
+                    folderId = _foldersRepository.GetFolderIdByName(folderName, isFolderAdded);
                 }
             });
 
@@ -126,12 +122,7 @@ namespace FilesApp.Controllers
         [HttpGet("open/{id}")]
         public async Task<IActionResult> OpenFile(string id)
         {
-            var file = _context.Items
-            .OfType<UserFile>()
-            .Where(f => f.Id == id)
-            .Select(f => new UserFile { Name = f.Name, Content = f.Content })
-            .FirstOrDefault();
-
+            var file = _filesRepository.Get(id);
             if (file == null)
             {
                 return NotFound();

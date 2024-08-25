@@ -6,6 +6,7 @@ using FilesApp.Controllers.API;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
+using FilesApp.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,16 +15,21 @@ namespace FilesApp.Controllers
 
     [ApiController]
     [Route("api/folders")]
-    public class FoldersApiController : BaseApiController
+    public class FoldersApiController : ControllerBase
     {
-        public FoldersApiController(FilesAppDbContext context) : base(context)
+        private readonly IFoldersRepository _foldersRepository;
+        private readonly IItemsRepository _itemsRepository;
+
+        public FoldersApiController(IFoldersRepository foldersRepository, IItemsRepository itemsRepository)
         {
+            _foldersRepository = foldersRepository;
+            _itemsRepository = itemsRepository;
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFolderData(string id)
         {
-            var folder = _context.Items.Where(i => i.Id == id).OfType<Folder>().Include(f => f.Items).FirstOrDefault();
+            var folder = _foldersRepository.Get(id);
             var subfolders = folder?.Items.OfType<Folder>();
             var files = folder?.Items.OfType<UserFile>();
 
@@ -34,8 +40,8 @@ namespace FilesApp.Controllers
                 {
                     f.Id,
                     f.Name,
-                    size = GetFolderSize(f.Id),
-                    lastModified = GetFolderLastModified(f.Id),
+                    size = _foldersRepository.GetSize(f.Id),
+                    lastModified = _foldersRepository.GetLastModified(f.Id),
                     f.IsStarred
                 }),
                 files
@@ -45,7 +51,7 @@ namespace FilesApp.Controllers
         [HttpPost("")]
         public async Task<IActionResult> CreateNewFolder([FromBody] CreateFolderBody body)
         {
-            var foldersCount = _context.Items.OfType<Folder>().Where(f => f.Name == body.Name).Count();
+            var foldersCount = _foldersRepository.GetCount(body.Name);
 
             var folderName = foldersCount > 0 ? $"{body.Name} ({foldersCount})" : body.Name;
             var newFolder = new Folder
@@ -53,8 +59,8 @@ namespace FilesApp.Controllers
                 Name = folderName,
                 FolderId = body.FolderId
             };
-            _context.Items.Add(newFolder);
-            await _context.SaveChangesAsync();
+            _itemsRepository.Add(newFolder);
+            await _itemsRepository.SaveAsync();
 
             return Created($"api/folders/{newFolder.Id}", new { folderId = newFolder.Id });
         }
