@@ -18,13 +18,9 @@ namespace FilesApp.Controllers
     public class FoldersApiController : ControllerBase
     {
         private readonly IFoldersRepository _foldersRepository;
-        private readonly IItemsRepository _itemsRepository;
 
-        public FoldersApiController(IFoldersRepository foldersRepository, IItemsRepository itemsRepository)
-        {
-            _foldersRepository = foldersRepository;
-            _itemsRepository = itemsRepository;
-        }
+        public FoldersApiController(IFoldersRepository foldersRepository) => _foldersRepository = foldersRepository;
+        
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFolderData(string id)
@@ -59,8 +55,8 @@ namespace FilesApp.Controllers
                 Name = folderName,
                 FolderId = body.FolderId
             };
-            _itemsRepository.Add(newFolder);
-            await _itemsRepository.SaveAsync();
+            _foldersRepository.Add(newFolder);
+            await _foldersRepository.SaveAsync();
 
             return Created($"api/folders/{newFolder.Id}", new { folderId = newFolder.Id });
         }

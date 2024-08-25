@@ -7,11 +7,8 @@ using FilesApp.Models.DAL;
 
 namespace FilesApp.Repository
 {
-    public interface IItemsRepository
+    public interface IItemsRepository: IRepository<Item>
     {
-        void Delete(Item item);
-
-        void Add(Item item);
 
         void DeleteMany(List<Item> items);
 
@@ -20,9 +17,5 @@ namespace FilesApp.Repository
         List<Item> GetByFolderIds(IEnumerable<string> ids);
 
         List<Item> GetAllByFolderIds(IEnumerable<string> ids);
-
-        Task<int> SaveAsync();
-
-        void Update<T>(Item item, Expression<Func<Item, T>> property, T newValue);
     }
 }

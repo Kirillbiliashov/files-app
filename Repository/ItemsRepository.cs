@@ -9,22 +9,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilesApp.Repository
 {
-    public class ItemsRepository : IItemsRepository
+    public class ItemsRepository : BaseRepository<Item>, IItemsRepository
     {
         private const string _allItemsQuery = "SELECT Id, Discriminator, FolderId, IsStarred, Name, NULL AS Content, LastModified, Size FROM Items WHERE FolderId IS NULL";
 
-        private readonly FilesAppDbContext _context;
-
-        public ItemsRepository(FilesAppDbContext context) => _context = context;
-
-        public void Add(Item item)
+        public ItemsRepository(FilesAppDbContext context) : base(context)
         {
-            _context.Items.Add(item);
-        }
-
-        public void Delete(Item item)
-        {
-            _context.Entry(item).State = EntityState.Deleted;
         }
 
         public void DeleteMany(List<Item> items)
@@ -42,13 +32,5 @@ namespace FilesApp.Repository
 
         public List<Item> GetTopLevelItems() => _context.Items.FromSqlRaw(_allItemsQuery).ToList();
 
-        public Task<int> SaveAsync() => _context.SaveChangesAsync();
-
-        public void Update<T>(Item item, Expression<Func<Item, T>> property, T newValue)
-        {
-            _context.Items.Attach(item);
-            _context.Entry(item).Property(property).CurrentValue = newValue;
-            _context.Entry(item).Property(property).IsModified = true;
-        }
     }
 }

@@ -6,10 +6,8 @@ using FilesApp.Models.DAL;
 
 namespace FilesApp.Repository
 {
-    public interface IFoldersRepository
+    public interface IFoldersRepository: IRepository<Folder>
     {
-        Folder? Get(string id);
-
         string? GetFolderName(string folderId);
 
         long GetSize(string id);

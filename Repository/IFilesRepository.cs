@@ -6,14 +6,7 @@ using FilesApp.Models.DAL;
 
 namespace FilesApp.Repository
 {
-    public interface IFilesRepository
+    public interface IFilesRepository: IRepository<UserFile>
     {
-        void Add(UserFile file);
-
-        void Save();
-
-        UserFile? Get(string id);
-
-        List<UserFile> GetAll(List<string> ids);
     }
 }

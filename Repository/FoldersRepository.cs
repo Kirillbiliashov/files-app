@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilesApp.Repository
 {
-    public class FoldersRepository : IFoldersRepository
+    public class FoldersRepository : BaseRepository<Folder>, IFoldersRepository
     {
         private const string _folderSizeQuery = @"
         WITH RecursiveFolders AS (
@@ -43,26 +43,27 @@ namespace FilesApp.Repository
         SELECT COALESCE(MAX(LastModified), 0) AS LastModified FROM RecursiveFolders;
         ";
 
-        private FilesAppDbContext _context;
-
-        public FoldersRepository(FilesAppDbContext context) => _context = context;
+        public FoldersRepository(FilesAppDbContext context) : base(context)
+        {
+        }
 
         public bool ExistsByName(string name) => _context.Items.OfType<Folder>().Any(i => i.Name == name);
 
-        public Folder? Get(string id) => _context.Items.Where(i => i.Id == id).OfType<Folder>().Include(f => f.Items).FirstOrDefault();
+        override public Folder? Get(string id) =>
+        _context.Items.Where(i => i.Id == id).OfType<Folder>().Include(f => f.Items).FirstOrDefault();
 
         public int GetCount(string name) => _context.Items.OfType<Folder>().Where(f => f.Name == name).Count();
 
         public string? GetFolderIdByName(string name, bool isFolderAdded)
         {
-             var folders = isFolderAdded ?
-             _context.ChangeTracker.Entries<Folder>().Select(e => e.Entity) :
-             _context.Items.OfType<Folder>();
+            var folders = isFolderAdded ?
+            _context.ChangeTracker.Entries<Folder>().Select(e => e.Entity) :
+            _context.Items.OfType<Folder>();
 
-                    return  folders
-                    .Where(f => f.Name == name)
-                    .Select(f => f.Id)
-                    .FirstOrDefault();
+            return folders
+            .Where(f => f.Name == name)
+            .Select(f => f.Id)
+            .FirstOrDefault();
         }
 
         public string? GetFolderName(string folderId) => _context.Items
@@ -73,83 +74,42 @@ namespace FilesApp.Repository
 
         public long? GetLastModified(string id)
         {
-            var conn = _context.Database.GetDbConnection();
-            DbDataReader reader = null;
-            try
+            var paramsDict = new Dictionary<string, object>
             {
-                conn.Open();
-                using (var command = conn.CreateCommand())
-                {
-                    command.CommandText = _folderModifiedQuery;
-                    var folderIdParam = command.CreateParameter();
-                    folderIdParam.ParameterName = "@FolderId";
-                    folderIdParam.Value = id;
-                    command.Parameters.Add(folderIdParam);
-                    reader = command.ExecuteReader();
+                {"FolderId", id}
+            };
 
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            return reader.GetInt64(0);
-                        }
-                    }
-                }
-            }
-            finally
+            return ExecuteRawQuery<long?>(_folderModifiedQuery, paramsDict, r =>
             {
-                if (reader != null)
+                while (r.Read())
                 {
-                    reader.DisposeAsync();
+                    return r.GetInt64(0);
                 }
-                conn.Close();
-            }
-
-            return null;
+                return null;
+            });
         }
 
         public long GetSize(string id)
         {
-            Console.WriteLine($"(get size) id: {id}");
-            var conn = _context.Database.GetDbConnection();
-            DbDataReader reader = null;
-            try
+            var paramsDict = new Dictionary<string, object>
             {
-                conn.Open();
-                using (var command = conn.CreateCommand())
-                {
-                    command.CommandText = _folderSizeQuery;
-                    var folderIdParam = command.CreateParameter();
-                    folderIdParam.ParameterName = "@FolderId";
-                    folderIdParam.Value = id;
-                    command.Parameters.Add(folderIdParam);
-                    reader = command.ExecuteReader();
+                {"FolderId", id}
+            };
 
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            return reader.GetInt64(0);
-                        }
-                    }
-                }
-            }
-            finally
+            return ExecuteRawQuery(_folderSizeQuery, paramsDict, r =>
             {
-                if (reader != null)
+                while (r.Read())
                 {
-                    reader.DisposeAsync();
+                    return r.GetInt64(0);
                 }
-                conn.Close();
-            }
-
-            return 0;
+                return 0;
+            });
         }
 
-        public bool IsTrackedByName(string name) => 
+        public bool IsTrackedByName(string name) =>
         _context.ChangeTracker.Entries<Folder>()
                 .Where(f => f.Entity.Name == name)
                 .Any();
-        
+
     }
 }
