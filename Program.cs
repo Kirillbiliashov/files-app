@@ -1,6 +1,9 @@
 using System.Text.Json.Serialization;
 using FilesApp.DAL;
+using FilesApp.Models.DAL;
 using FilesApp.Repository;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,11 +14,20 @@ builder.Services.AddControllersWithViews()
 .AddJsonOptions(x =>
    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
+builder.Services.AddAuthorization();
+builder.Services.AddIdentity<AppUser, IdentityRole>()
+    .AddEntityFrameworkStores<FilesAppDbContext>();
+
 builder.Services.AddDbContext<FilesAppDbContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"))
     .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
     .EnableSensitiveDataLogging()
     .EnableDetailedErrors());
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie();
 
 builder.Services.AddScoped<IFilesRepository, FilesRepository>();
 builder.Services.AddScoped<IFoldersRepository, FoldersRepository>();
@@ -38,6 +50,9 @@ app.UseRouting();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller}/{action=Index}/{id?}");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapFallbackToFile("index.html");
 
