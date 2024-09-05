@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
+using FilesApp.DAL;
 using FilesApp.Models.Auth;
 using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
@@ -22,6 +23,7 @@ namespace FilesApp.Controllers.API
         private readonly UserManager<AppUser> _userManager;
 
         public AuthApiController(UserManager<AppUser> userManager) => _userManager = userManager;
+        
 
         [HttpPost("register")]
         public async Task<IActionResult> RegisterNewUser([FromBody] RegisterUserBody body)
@@ -41,6 +43,35 @@ namespace FilesApp.Controllers.API
                 return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
             }
 
+            await SetCookies(user);
+
+            return Ok(new { });
+
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginUser([FromBody] RegisterUserBody body)
+        {
+            var user = await _userManager.FindByEmailAsync(body.Email);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var isValidPassword = await _userManager.CheckPasswordAsync(user, body.Password);
+            if (!isValidPassword)
+            {
+                return Unauthorized();
+            }
+
+            await SetCookies(user);
+
+            return Ok(new { });
+
+        }
+
+        private async Task SetCookies(AppUser user)
+        {
             var cookieUser = new CookieUser
             {
                 Id = user.Id,
@@ -62,13 +93,14 @@ namespace FilesApp.Controllers.API
                 ExpiresUtc = DateTime.UtcNow.AddDays(1)
             };
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-
-            return Ok(new {});
-
         }
 
         [Authorize]
-        [HttpGet("auth-test")]
-        public object AuthTest() => new { tesed = true };
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return Ok(new { });
+        }
     }
 }
