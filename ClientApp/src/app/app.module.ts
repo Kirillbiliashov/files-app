@@ -12,6 +12,7 @@ import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { FolderComponent } from './folder/folder.component';
 import { FilesTableComponent } from './files-table/files-table.component';
 import { FilesActionsComponent } from './files-actions/files-actions.component';
+import { RegisterComponent } from './register/register.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { FilesActionsComponent } from './files-actions/files-actions.component';
     FetchDataComponent,
     FolderComponent,
     FilesTableComponent,
-    FilesActionsComponent
+    FilesActionsComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -31,8 +33,7 @@ import { FilesActionsComponent } from './files-actions/files-actions.component';
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'folders/:id', component: FolderComponent },
-      { path: 'counter', component: CounterComponent },
-      { path: 'fetch-data', component: FetchDataComponent },
+      { path: 'register', component: RegisterComponent },
     ])
   ],
   providers: [],

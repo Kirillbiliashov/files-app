@@ -8,6 +8,7 @@ using FilesApp.DAL;
 using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
 using FilesApp.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MimeMapping;
@@ -30,9 +31,14 @@ namespace FilesApp.Controllers
             _filesRepository = filesRepository;
         }
 
+
         [HttpGet("")]
         public async Task<IActionResult> GetAllFiles()
         {
+            if (!HttpContext.User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
             var items = _itemsRepository.GetTopLevelItems();
 
             return Ok(new

@@ -9,6 +9,7 @@ using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,8 +63,12 @@ namespace FilesApp.Controllers.API
             };
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
-            return Created($"api/users/{user.Id}", new { userId = user.Id });
+            return Ok(new {});
 
         }
+
+        [Authorize]
+        [HttpGet("auth-test")]
+        public object AuthTest() => new { tesed = true };
     }
 }

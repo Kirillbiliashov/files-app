@@ -13,7 +13,7 @@ export class HomeComponent implements OnInit {
   folderName: string = "";
   public data: FileData | null = null;
 
-  constructor(private filesService: FilesHttpService) { }
+  constructor(private filesService: FilesHttpService, private router: Router) { }
 
   ngOnInit(): void {
     this.loadFiles();
@@ -21,7 +21,10 @@ export class HomeComponent implements OnInit {
 
   loadFiles() {
     this.filesService.getFiles()
-      .subscribe(data => this.data = data);
+      .subscribe({
+        next: data => this.data = data,
+        error: e =>  this.router.navigate(['/register']) 
+      });
   }
 
 }
