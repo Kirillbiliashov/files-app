@@ -20,11 +20,7 @@ export class HomeComponent implements OnInit {
   }
 
   loadFiles() {
-    this.filesService.getFiles()
-      .subscribe({
-        next: data => this.data = data,
-        error: e =>  this.router.navigate(['/register']) 
-      });
+    this.filesService.getFiles().subscribe();
   }
 
 }

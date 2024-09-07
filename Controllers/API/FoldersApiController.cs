@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FilesApp.Attributes;
 using FilesApp.Controllers.API;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
@@ -13,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FilesApp.Controllers
 {
 
+    [AllowOnlyAuthorized]
     [ApiController]
     [Route("api/folders")]
     public class FoldersApiController : ControllerBase

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using FilesApp.Attributes;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
@@ -12,6 +13,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilesApp.Controllers.API
 {
+
+    [AllowOnlyAuthorized]
     [ApiController]
     [Route("api/items")]
     public class ItemsApiController : ControllerBase

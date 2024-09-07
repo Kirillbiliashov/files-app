@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using FilesApp.Attributes;
 using FilesApp.Controllers.API;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
@@ -15,6 +16,7 @@ using MimeMapping;
 
 namespace FilesApp.Controllers
 {
+    [AllowOnlyAuthorized]
     [ApiController]
     [Route("api/files")]
     public class FilesApiController : ControllerBase
@@ -35,10 +37,6 @@ namespace FilesApp.Controllers
         [HttpGet("")]
         public async Task<IActionResult> GetAllFiles()
         {
-            if (!HttpContext.User.Identity.IsAuthenticated)
-            {
-                return Unauthorized();
-            }
             var items = _itemsRepository.GetTopLevelItems();
 
             return Ok(new

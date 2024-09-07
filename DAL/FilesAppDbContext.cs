@@ -11,9 +11,10 @@ namespace FilesApp.DAL
     public class FilesAppDbContext : IdentityDbContext<AppUser>
     {
 
-        public FilesAppDbContext(DbContextOptions<FilesAppDbContext> options): base(options) {}
-
         public DbSet<Item> Items { get; set; }
+
+        public FilesAppDbContext(DbContextOptions<FilesAppDbContext> options) : base(options) { }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

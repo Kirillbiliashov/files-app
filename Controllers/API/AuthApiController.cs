@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
+using FilesApp.Attributes;
 using FilesApp.DAL;
 using FilesApp.Models.Auth;
 using FilesApp.Models.DAL;
@@ -95,7 +96,7 @@ namespace FilesApp.Controllers.API
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
         }
 
-        [Authorize]
+        [AllowOnlyAuthorized]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
