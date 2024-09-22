@@ -15,7 +15,7 @@ namespace FilesApp.Repository
         WITH RecursiveFolders AS (
         SELECT Id, FolderId, Size
         FROM Items
-        WHERE Id = @FolderId
+        WHERE UserId = @UserId AND Id = @FolderId
     
         UNION ALL
     
@@ -31,7 +31,7 @@ namespace FilesApp.Repository
         WITH RecursiveFolders AS (
         SELECT Id, FolderId, LastModified
         FROM Items
-        WHERE Id = @FolderId
+        WHERE  UserId = @UserId AND Id = @FolderId
     
         UNION ALL
     
@@ -47,36 +47,39 @@ namespace FilesApp.Repository
         {
         }
 
-        public bool ExistsByName(string name) => _context.Items.OfType<Folder>().Any(i => i.Name == name);
+        public bool ExistsByName(string userId, string name) =>
+         _context.Items.OfType<Folder>().Any(i => i.UserId == userId && i.Name == name);
 
-        override public Folder? Get(string id) =>
-        _context.Items.Where(i => i.Id == id).OfType<Folder>().Include(f => f.Items).FirstOrDefault();
+        override public Folder? Get(string userId, string id) =>
+        _context.Items.Where(i => i.UserId == userId && i.Id == id).OfType<Folder>().Include(f => f.Items).FirstOrDefault();
 
-        public int GetCount(string name) => _context.Items.OfType<Folder>().Where(f => f.Name == name).Count();
+        public int GetCount(string userId, string name) =>
+         _context.Items.OfType<Folder>().Where(f => f.UserId == userId && f.Name == name).Count();
 
-        public string? GetFolderIdByName(string name, bool isFolderAdded)
+        public string? GetFolderIdByName(string userId, string name, bool isFolderAdded)
         {
             var folders = isFolderAdded ?
             _context.ChangeTracker.Entries<Folder>().Select(e => e.Entity) :
             _context.Items.OfType<Folder>();
 
             return folders
-            .Where(f => f.Name == name)
+            .Where(f => f.UserId == userId && f.Name == name)
             .Select(f => f.Id)
             .FirstOrDefault();
         }
 
-        public string? GetFolderName(string folderId) => _context.Items
+        public string? GetFolderName(string userId, string folderId) => _context.Items
         .OfType<Folder>()
-        .Where(f => f.Id == folderId)
+        .Where(f => f.UserId == userId && f.Id == folderId)
         .Select(f => f.Name)
         .FirstOrDefault();
 
-        public long? GetLastModified(string id)
+        public long? GetLastModified(string userId, string id)
         {
             var paramsDict = new Dictionary<string, object>
             {
-                {"FolderId", id}
+                {"UserId", userId},
+                {"FolderId", id},
             };
 
             return ExecuteRawQuery<long?>(_folderModifiedQuery, paramsDict, r =>
@@ -89,10 +92,12 @@ namespace FilesApp.Repository
             });
         }
 
-        public long GetSize(string id)
+        public long GetSize(string userId, string id)
         {
+            Console.WriteLine($"GetSize, user id: {userId}, folder id: {id}");
             var paramsDict = new Dictionary<string, object>
             {
+                {"UserId", userId},
                 {"FolderId", id}
             };
 
@@ -106,9 +111,9 @@ namespace FilesApp.Repository
             });
         }
 
-        public bool IsTrackedByName(string name) =>
+        public bool IsTrackedByName(string userId, string name) =>
         _context.ChangeTracker.Entries<Folder>()
-                .Where(f => f.Entity.Name == name)
+                .Where(f => f.Entity.UserId == userId && f.Entity.Name == name)
                 .Any();
 
     }

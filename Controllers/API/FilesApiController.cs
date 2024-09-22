@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using FilesApp.Attributes;
 using FilesApp.Controllers.API;
 using FilesApp.DAL;
+using FilesApp.Models.Auth;
 using FilesApp.Models.DAL;
 using FilesApp.Models.Http;
 using FilesApp.Repository;
@@ -19,7 +21,7 @@ namespace FilesApp.Controllers
     [AllowOnlyAuthorized]
     [ApiController]
     [Route("api/files")]
-    public class FilesApiController : ControllerBase
+    public class FilesApiController : BaseApiController
     {
 
         private readonly IItemsRepository _itemsRepository;
@@ -37,8 +39,9 @@ namespace FilesApp.Controllers
         [HttpGet("")]
         public async Task<IActionResult> GetAllFiles()
         {
-            var items = _itemsRepository.GetTopLevelItems();
-
+            Console.WriteLine($"GetAllFiles, user id: {UserId}");
+            var items = _itemsRepository.GetTopLevelItems(UserId);
+            Console.WriteLine($"items length: {items.Count}");
             return Ok(new
             {
                 files = items.OfType<UserFile>().ToList(),
@@ -46,8 +49,8 @@ namespace FilesApp.Controllers
                 {
                     f.Id,
                     f.Name,
-                    size = _foldersRepository.GetSize(f.Id),
-                    lastModified = _foldersRepository.GetLastModified(f.Id),
+                    size = _foldersRepository.GetSize(UserId, f.Id),
+                    lastModified = _foldersRepository.GetLastModified(UserId, f.Id),
                     f.IsStarred
                 })
             });
@@ -61,7 +64,7 @@ namespace FilesApp.Controllers
                 return BadRequest();
             }
 
-            var folderName = folder != null ? _foldersRepository.GetFolderName(folder) : null;
+            var folderName = folder != null ? _foldersRepository.GetFolderName(UserId, folder) : null;
 
             for (int i = 0; i < files.Count; i++)
             {
@@ -76,6 +79,7 @@ namespace FilesApp.Controllers
                     memoryStream.Read(buffer, 0, buffer.Length);
                     _itemsRepository.Add(new UserFile
                     {
+                        UserId = UserId,
                         Name = files[i].FileName.Split("/").Last(),
                         Size = files[i].Length,
                         LastModified = long.Parse(lastModified[lastModifiedKey]),
@@ -102,12 +106,13 @@ namespace FilesApp.Controllers
 
             folderPaths.ForEach(folderName =>
             {
-                var isFolderAdded = _foldersRepository.IsTrackedByName(folderName);
+                var isFolderAdded = _foldersRepository.IsTrackedByName(UserId, folderName);
 
-                if (!(isFolderAdded || _foldersRepository.ExistsByName(folderName)))
+                if (!(isFolderAdded || _foldersRepository.ExistsByName(UserId, folderName)))
                 {
                     var folder = new Folder
                     {
+                        UserId = UserId,
                         Name = folderName,
                         FolderId = folderId
                     };
@@ -116,7 +121,7 @@ namespace FilesApp.Controllers
                 }
                 else
                 {
-                    folderId = _foldersRepository.GetFolderIdByName(folderName, isFolderAdded);
+                    folderId = _foldersRepository.GetFolderIdByName(UserId, folderName, isFolderAdded);
                 }
             });
 
@@ -126,7 +131,7 @@ namespace FilesApp.Controllers
         [HttpGet("open/{id}")]
         public async Task<IActionResult> OpenFile(string id)
         {
-            var file = _filesRepository.Get(id);
+            var file = _filesRepository.Get(UserId, id);
             if (file == null)
             {
                 return NotFound();

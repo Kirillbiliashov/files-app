@@ -20,7 +20,7 @@ namespace FilesApp.Controllers.API
 {
     [ApiController]
     [Route("api/auth")]
-    public class AuthApiController : ControllerBase
+    public class AuthApiController : BaseApiController
     {
         private readonly UserManager<AppUser> _userManager;
 

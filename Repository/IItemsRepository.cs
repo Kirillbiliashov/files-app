@@ -12,10 +12,10 @@ namespace FilesApp.Repository
 
         void DeleteMany(List<Item> items);
 
-        List<Item> GetTopLevelItems();
+        List<Item> GetTopLevelItems(string userId);
 
-        List<Item> GetByFolderIds(IEnumerable<string> ids);
+        List<Item> GetByFolderIds(string userId, IEnumerable<string> ids);
 
-        List<Item> GetAllByFolderIds(IEnumerable<string> ids);
+        List<Item> GetAllByFolderIds(string userId, IEnumerable<string> ids);
     }
 }

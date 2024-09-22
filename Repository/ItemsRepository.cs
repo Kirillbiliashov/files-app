@@ -5,13 +5,14 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace FilesApp.Repository
 {
     public class ItemsRepository : BaseRepository<Item>, IItemsRepository
     {
-        private const string _allItemsQuery = "SELECT Id, Discriminator, FolderId, IsStarred, Name, NULL AS Content, LastModified, Size FROM Items WHERE FolderId IS NULL";
+        private const string _allItemsQuery = "SELECT Id, Discriminator, FolderId, IsStarred, Name, NULL AS Content, LastModified, Size, UserId FROM Items WHERE FolderId IS NULL AND UserId = @UserId";
 
         public ItemsRepository(FilesAppDbContext context) : base(context)
         {
@@ -22,15 +23,20 @@ namespace FilesApp.Repository
             items.ForEach(i => _context.Entry(i).State = EntityState.Deleted);
         }
 
-        public List<Item> GetByFolderIds(IEnumerable<string> ids) => _context.Items
-            .Where(i => i.FolderId != null && ids.Contains(i.FolderId))
-            .Select(i =>  new Item { Id = i.Id, FolderId = i.FolderId })
+        public List<Item> GetByFolderIds(string userId, IEnumerable<string> ids) => _context.Items
+            .Where(i => i.UserId == userId && i.FolderId != null && ids.Contains(i.FolderId))
+            .Select(i => new Item { Id = i.Id, FolderId = i.FolderId })
             .ToList();
 
-        public List<Item> GetAllByFolderIds(IEnumerable<string> ids) => 
-        _context.Items.Where(i => i.FolderId != null && ids.Contains(i.FolderId)).ToList();
+        public List<Item> GetAllByFolderIds(string userId, IEnumerable<string> ids) =>
+        _context.Items.Where(i => i.UserId == userId && i.FolderId != null && ids.Contains(i.FolderId)).ToList();
 
-        public List<Item> GetTopLevelItems() => _context.Items.FromSqlRaw(_allItemsQuery).ToList();
+        public List<Item> GetTopLevelItems(string userId)
+        {
+            Console.WriteLine($"current user id: {userId}");
+            var userIdParameter = new SqlParameter("@UserId", userId);
+            return _context.Items.FromSqlRaw(_allItemsQuery, userIdParameter).ToList();
+        }
 
     }
 }

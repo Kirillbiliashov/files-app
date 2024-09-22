@@ -17,7 +17,7 @@ namespace FilesApp.Controllers
     [AllowOnlyAuthorized]
     [ApiController]
     [Route("api/folders")]
-    public class FoldersApiController : ControllerBase
+    public class FoldersApiController : BaseApiController
     {
         private readonly IFoldersRepository _foldersRepository;
 
@@ -27,7 +27,7 @@ namespace FilesApp.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFolderData(string id)
         {
-            var folder = _foldersRepository.Get(id);
+            var folder = _foldersRepository.Get(UserId, id);
             var subfolders = folder?.Items.OfType<Folder>();
             var files = folder?.Items.OfType<UserFile>();
 
@@ -38,8 +38,8 @@ namespace FilesApp.Controllers
                 {
                     f.Id,
                     f.Name,
-                    size = _foldersRepository.GetSize(f.Id),
-                    lastModified = _foldersRepository.GetLastModified(f.Id),
+                    size = _foldersRepository.GetSize(UserId, f.Id),
+                    lastModified = _foldersRepository.GetLastModified(UserId, f.Id),
                     f.IsStarred
                 }),
                 files
@@ -49,11 +49,12 @@ namespace FilesApp.Controllers
         [HttpPost("")]
         public async Task<IActionResult> CreateNewFolder([FromBody] CreateFolderBody body)
         {
-            var foldersCount = _foldersRepository.GetCount(body.Name);
+            var foldersCount = _foldersRepository.GetCount(UserId, body.Name);
 
             var folderName = foldersCount > 0 ? $"{body.Name} ({foldersCount})" : body.Name;
             var newFolder = new Folder
             {
+                UserId = UserId,
                 Name = folderName,
                 FolderId = body.FolderId
             };

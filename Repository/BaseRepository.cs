@@ -36,13 +36,13 @@ namespace FilesApp.Repository
                 using (var command = conn.CreateCommand())
                 {
                     command.CommandText = queryStr;
-                    var folderIdParam = command.CreateParameter();
                     foreach (var pair in paramsDict)
                     {
-                        folderIdParam.ParameterName = $"@{pair.Key}";
-                        folderIdParam.Value = pair.Value;
+                        var parameter = command.CreateParameter();
+                        parameter.ParameterName = $"@{pair.Key}";
+                        parameter.Value = pair.Value;
+                        command.Parameters.Add(parameter);
                     }
-                    command.Parameters.Add(folderIdParam);
                     reader = command.ExecuteReader();
 
                     if (reader.HasRows)
@@ -63,14 +63,14 @@ namespace FilesApp.Repository
             return default;
         }
 
-        public virtual T? Get(string id) =>
+        public virtual T? Get(string userId, string id) =>
          _context.Set<T>().Where(e => e.Id == id).FirstOrDefault();
 
 
-        public List<T> GetAll() => _context.Set<T>().ToList();
+        public List<T> GetAll(string userId) => _context.Set<T>().Where(i => i.UserId == userId).ToList();
 
-        public List<T> GetAll(List<string> ids) =>
-         _context.Set<T>().Where(e => ids.Contains(e.Id)).ToList();
+        public List<T> GetAll(string userId, List<string> ids) =>
+         _context.Set<T>().Where(e => e.UserId == userId && ids.Contains(e.Id)).ToList();
 
         public async Task<int> SaveAsync() => await _context.SaveChangesAsync();
 

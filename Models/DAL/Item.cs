@@ -9,6 +9,8 @@ namespace FilesApp.Models.DAL
     {
         public string Id { get; init; } = Guid.NewGuid().ToString();
 
+        public string UserId { get; init; }
+
         public string Name { get; set; }
 
         public string? FolderId { get; set; }
@@ -16,5 +18,6 @@ namespace FilesApp.Models.DAL
         public bool IsStarred { get; set; }
 
         public Folder? Folder { get; set; }
+
     }
 }

@@ -8,5 +8,7 @@ namespace FilesApp.Models.DAL
     public interface IEntity
     {
         string Id { get; init; }
+
+        string UserId { get; init; }
     }
 }

@@ -20,7 +20,7 @@ export class HomeComponent implements OnInit {
   }
 
   loadFiles() {
-    this.filesService.getFiles().subscribe();
+    this.filesService.getFiles().subscribe(data => this.data = data);
   }
 
 }

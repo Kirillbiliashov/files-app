@@ -17,7 +17,7 @@ namespace FilesApp.Controllers.API
     [AllowOnlyAuthorized]
     [ApiController]
     [Route("api/items")]
-    public class ItemsApiController : ControllerBase
+    public class ItemsApiController : BaseApiController
     {
 
         private readonly IItemsRepository _itemsRepository;
@@ -64,7 +64,7 @@ namespace FilesApp.Controllers.API
                 return;
             }
 
-            var nestedItems = _itemsRepository.GetByFolderIds(folderIds);
+            var nestedItems = _itemsRepository.GetByFolderIds(UserId, folderIds);
             DeleteNestedFolderItems(nestedItems.Select(i => i.Id));
             _itemsRepository.DeleteMany(nestedItems);
         }
@@ -80,7 +80,7 @@ namespace FilesApp.Controllers.API
                 var ids = group.Select(g => g.Id).ToList();
                 if (group.Key == "file")
                 {
-                    var dbFiles = _filesRepository.GetAll(ids);
+                    var dbFiles = _filesRepository.GetAll(UserId, ids);
                     files.AddRange(dbFiles);
                 }
                 else if (group.Key == "folder")
@@ -116,7 +116,7 @@ namespace FilesApp.Controllers.API
                 return new List<UserFile>();
             }
 
-            var nestedItems = _itemsRepository.GetAllByFolderIds(folderIds);
+            var nestedItems = _itemsRepository.GetAllByFolderIds(UserId, folderIds);
 
             return nestedItems
             .OfType<UserFile>()

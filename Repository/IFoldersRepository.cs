@@ -8,18 +8,18 @@ namespace FilesApp.Repository
 {
     public interface IFoldersRepository: IRepository<Folder>
     {
-        string? GetFolderName(string folderId);
+        string? GetFolderName(string userId, string folderId);
 
-        long GetSize(string id);
+        long GetSize(string userId, string id);
 
-        int GetCount(string name);
+        int GetCount(string userId, string name);
 
-        long? GetLastModified(string id);
+        long? GetLastModified(string userId, string id);
 
-        bool ExistsByName(string name);
+        bool ExistsByName(string userId, string name);
 
-        bool IsTrackedByName(string name);
+        bool IsTrackedByName(string userId, string name);
 
-        string? GetFolderIdByName(string name, bool isFolderAdded);
+        string? GetFolderIdByName(string userId, string name, bool isFolderAdded);
     }
 }

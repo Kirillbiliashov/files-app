@@ -14,11 +14,11 @@ namespace FilesApp.Repository
 
         void Add(T entity);
 
-         List<T> GetAll();
+         List<T> GetAll(string userId);
 
-        List<T> GetAll(List<string> ids);
+        List<T> GetAll(string userId, List<string> ids);
 
-        T? Get(string id);
+        T? Get(string UserId, string id);
 
         void Update<TProperty>(T entity, Expression<Func<T, TProperty>> property, TProperty newValue);
 
