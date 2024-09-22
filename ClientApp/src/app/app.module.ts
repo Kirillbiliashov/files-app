@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
@@ -13,7 +13,8 @@ import { FolderComponent } from './folder/folder.component';
 import { FilesTableComponent } from './files-table/files-table.component';
 import { FilesActionsComponent } from './files-actions/files-actions.component';
 import { RegisterComponent } from './register/register.component';
-import { AuthInterceptor } from './auth.interceptor';
+import { LoginComponent } from './login/login.component';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { AuthInterceptor } from './auth.interceptor';
     FolderComponent,
     FilesTableComponent,
     FilesActionsComponent,
-    RegisterComponent
+    RegisterComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -35,7 +37,9 @@ import { AuthInterceptor } from './auth.interceptor';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'folders/:id', component: FolderComponent },
       { path: 'register', component: RegisterComponent },
-    ])
+      { path: 'login', component: LoginComponent },
+    ]),
+    ReactiveFormsModule
   ],
   providers: [
     {

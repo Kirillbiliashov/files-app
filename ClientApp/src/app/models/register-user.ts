@@ -1,9 +1,13 @@
-export class RegisterUser {
+import { LoginUser } from "./login-user";
+
+export class RegisterUser extends LoginUser {
 
     constructor(
         private firstName: string,
         private lastName: string,
-        private email: string,
-        private password: string) { }
+        email: string,
+        password: string) {
+        super(email, password);
+    }
 
 }

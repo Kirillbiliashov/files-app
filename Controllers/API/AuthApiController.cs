@@ -12,6 +12,7 @@ using FilesApp.Models.Http;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,7 +32,7 @@ namespace FilesApp.Controllers.API
         {
             var user = new AppUser
             {
-                UserName = $"{body.FirstName}_{body.LastName}",
+                UserName = body.Email.Split("@").FirstOrDefault(),
                 FirstName = body.FirstName,
                 LastName = body.LastName,
                 Email = body.Email
@@ -51,8 +52,9 @@ namespace FilesApp.Controllers.API
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LoginUser([FromBody] RegisterUserBody body)
+        public async Task<IActionResult> LoginUser([FromBody] LoginUserBody body)
         {
+            Console.WriteLine($"inside login, body: {JsonSerializer.Serialize(body)}");
             var user = await _userManager.FindByEmailAsync(body.Email);
             if (user == null)
             {
@@ -68,7 +70,6 @@ namespace FilesApp.Controllers.API
             await SetCookies(user);
 
             return Ok(new { });
-
         }
 
         private async Task SetCookies(AppUser user)
@@ -97,6 +98,7 @@ namespace FilesApp.Controllers.API
         }
 
         [AllowOnlyAuthorized]
+        [HttpGet("logout")]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {

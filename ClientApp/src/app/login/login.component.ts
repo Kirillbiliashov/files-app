@@ -1,15 +1,15 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, NgModel, Validators } from '@angular/forms';
-import { RegisterUser } from '../models/register-user';
+import { LoginUser } from '../models/login-user';
 import { AuthHttpService } from '../services/auth-service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
-export class RegisterComponent {
+export class LoginComponent {
   signUpAttempted = false;
   showPassword = false;
   userForm: FormGroup;
@@ -17,8 +17,6 @@ export class RegisterComponent {
   constructor(private authService: AuthHttpService, private router: Router, private fb: FormBuilder) {
     this.userForm = fb.group({
       email: ['', [Validators.required, Validators.email]],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
       password: [
         '',
         [
@@ -30,12 +28,12 @@ export class RegisterComponent {
     });
   }
 
-  signUp() {
+  login() {
     this.signUpAttempted = true;
     if (this.userForm.valid) {
-      const { firstName, lastName, email, password } = this.userForm.value;
-      const newUser = new RegisterUser(firstName, lastName, email, password);
-      this.authService.register(newUser).subscribe({
+      const { email, password } = this.userForm.value;
+      const user = new LoginUser(email, password);
+      this.authService.login(user).subscribe({
         next: () => this.router.navigate(['/']),
         error: console.log
       })
