@@ -15,6 +15,7 @@ export class FilesTableComponent {
   @Input() folders: UserFolder[] = [];
   @Input() files: UserFile[] = [];
   @Output() onFilesChange = new EventEmitter();
+  @Output() onInfoChange = new EventEmitter();
 
   lastHoverIdx: number = -1;
   headerHovered: boolean = false;
@@ -52,8 +53,11 @@ export class FilesTableComponent {
   }
 
   deleteFiles() {
+    this.onInfoChange.emit(`Deleting ${this.selectedTableItems.length} items...`);
     this.itemsService.deleteItems(this.selectedTableItems).subscribe({
       next: () => {
+        this.onInfoChange.emit(`Successfully deleted ${this.selectedTableItems.length} items.`);
+        setTimeout(() => this.onInfoChange.emit(''), 3000);
         this.selectedTableItems = [];
         this.onFilesChange.emit();
       },
@@ -62,6 +66,7 @@ export class FilesTableComponent {
   }
 
   downloadFiles() {
+    this.onInfoChange.emit(`Downloading items...`);
     this.itemsService.downloadItems(this.selectedTableItems).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -72,6 +77,7 @@ export class FilesTableComponent {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+        this.onInfoChange.emit('');
       },
       error: () => { }
     });

@@ -1,9 +1,27 @@
-<app-files-actions (onFileUpload)="loadFiles()"></app-files-actions>
+<style>
+    .alert-primary {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: #f0f0f0;
+    color: black;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+</style>
+
+<app-files-actions (onFileUpload)="loadFiles()" (onInfoChange)="onNewInfo($event)"></app-files-actions>
 
 <h3 style="margin-top: 50px">All files</h3>
 <ng-container *ngIf="data">
-  <app-files-table [files]="data.files" [folders]="data.folders" (onFilesChange)="loadFiles()"></app-files-table>
+  <app-files-table [files]="data.files" [folders]="data.folders" (onFilesChange)="loadFiles()" (onInfoChange)="onNewInfo($event)"></app-files-table>
 
 </ng-container>
 
 
+<div *ngIf="infoMessage" class="alert alert-primary" role="alert">
+  {{infoMessage}}
+</div>

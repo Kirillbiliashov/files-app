@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class FilesActionsComponent {
   @Output() onFileUpload = new EventEmitter();
+  @Output() onInfoChange = new EventEmitter();
   folderName: string = "";
 
 
@@ -26,8 +27,17 @@ export class FilesActionsComponent {
   uploadFile(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
+      const fileNames: string[] = [];
+      for (let i = 0; i < input.files.length; i++) {
+        fileNames.push(input.files[i].name);
+      }
+      this.onInfoChange.emit(`Uploading files: ${fileNames.join(', ')}`)
       this.filesService.uploadFiles(input.files, this.folderId)
-        .subscribe(_ => this.onFileUpload.emit())
+        .subscribe(_ => {
+          this.onFileUpload.emit();
+          this.onInfoChange.emit(`Files uploaded.`);
+          setTimeout(() => this.onInfoChange.emit(''), 3000);
+        })
     }
   }
 

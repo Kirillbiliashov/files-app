@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 export class HomeComponent implements OnInit {
   folderName: string = "";
   public data: FileData | null = null;
+  infoMessage = '';
 
   constructor(private filesService: FilesHttpService, private router: Router) { }
 
@@ -21,6 +22,10 @@ export class HomeComponent implements OnInit {
 
   loadFiles() {
     this.filesService.getFiles().subscribe(data => this.data = data);
+  }
+
+  onNewInfo(message: string) {
+    this.infoMessage = message
   }
 
 }
