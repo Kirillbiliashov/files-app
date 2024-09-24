@@ -92,7 +92,7 @@ namespace FilesApp.Controllers.API
                 AllowRefresh = true,
                 IsPersistent = true,
                 IssuedUtc = DateTime.UtcNow,
-                ExpiresUtc = DateTime.UtcNow.AddDays(1)
+                ExpiresUtc = DateTime.UtcNow.AddMonths(6)
             };
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
         }

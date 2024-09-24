@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
 import { UserFolder } from '../models/user-folder';
 import { UserFile } from '../models/user-file';
 import { FilesHttpService } from '../services/files-service';
@@ -22,6 +22,7 @@ export class FilesTableComponent {
   showStarredOnly: boolean = false;
 
   constructor(private filesService: FilesHttpService, private itemsService: ItemsHttpService) { }
+
 
   changeSelection(checked: boolean, type: string, id: string) {
     if (checked) {

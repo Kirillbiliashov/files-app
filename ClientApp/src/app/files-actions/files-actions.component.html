@@ -1,3 +1,16 @@
+<style>
+  .upload-btn::after {
+    content: none;
+}
+button:hover {
+    background-color: #f0f0f0; 
+    border-color: #999999; 
+}
+button:focus {
+    outline: none;
+}
+</style>
+
 <div class="d-flex">
     <form>
       <div class="form-group">
@@ -5,8 +18,13 @@
         <input type="file" id="folder" multiple (change)="uploadFile($event)" hidden #folderInput webkitdirectory
           directory multiple />
         <div class="btn-group">
-          <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            Upload
+          <button style="border-color: black; height: fit-content;  width: 120px" type="button" class="btn btn-outline upload-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="d-flex flex-column align-items-start" style="gap: 5px">
+              <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+
+              <span style="font-size: 0.9rem">Upload</span>
+            </div>
+            
           </button>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" (click)="openFileChooser(fileInput)">File</a></li>
@@ -16,8 +34,11 @@
   
       </div>
     </form>
-    <button type="button" class="btn btn-primary" aria-expanded="false" style="margin-left: 15px;" data-bs-toggle="modal" data-bs-target="#exampleModal">
-      Create folder
+    <button type="button" class="btn btn-outline" aria-expanded="false" style="margin-left: 15px; border-color: black; width: 120px" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      <div class="d-flex flex-column align-items-start" style="gap: 5px">
+        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 13H15M12 10V16M12.0627 6.06274L11.9373 5.93726C11.5914 5.59135 11.4184 5.4184 11.2166 5.29472C11.0376 5.18506 10.8425 5.10425 10.6385 5.05526C10.4083 5 10.1637 5 9.67452 5H6.2C5.0799 5 4.51984 5 4.09202 5.21799C3.71569 5.40973 3.40973 5.71569 3.21799 6.09202C3 6.51984 3 7.07989 3 8.2V15.8C3 16.9201 3 17.4802 3.21799 17.908C3.40973 18.2843 3.71569 18.5903 4.09202 18.782C4.51984 19 5.07989 19 6.2 19H17.8C18.9201 19 19.4802 19 19.908 18.782C20.2843 18.5903 20.5903 18.2843 20.782 17.908C21 17.4802 21 16.9201 21 15.8V10.2C21 9.0799 21 8.51984 20.782 8.09202C20.5903 7.71569 20.2843 7.40973 19.908 7.21799C19.4802 7 18.9201 7 17.8 7H14.3255C13.8363 7 13.5917 7 13.3615 6.94474C13.1575 6.89575 12.9624 6.81494 12.7834 6.70528C12.5816 6.5816 12.4086 6.40865 12.0627 6.06274Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+        <span style="font-size: 0.9rem">Create folder</span>
+      </div>
     </button>
   </div>
 

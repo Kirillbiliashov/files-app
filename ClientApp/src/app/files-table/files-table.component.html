@@ -8,10 +8,25 @@
     font-size: 0.9rem;
     font-weight: 500;
   }
+
+  .starred-btn-clicked {
+    background-color: black;
+    color: white;
+  }
+
+  .starred-btn-clicked:hover {
+    background-color: #444;
+  }
+
+  .starred-btn:hover, .download-btn:hover, .delete-btn:hover {
+    background-color: #f0f0f0 !important; 
+    border-color: #999999; 
+    color: black;
+}
 </style>
 <div class="d-flex" style="gap: 10px" *ngIf="selectedTableItems.length > 0">
-  <button type="button" class="btn btn-outline-dark" (click)="downloadFiles()"><span>
-      <svg style="margin: 0; padding: 0" width="16px" height="16px" viewBox="0 0 24 24" fill="none"
+  <button  type="button" style="border-color: black;"  class="btn btn-outline-dark download-btn" (click)="downloadFiles()"><span>
+      <svg style="margin-bottom: 3px"  width="16px" height="16px" viewBox="0 0 24 24" fill="none"
         xmlns="http://www.w3.org/2000/svg">
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -23,8 +38,8 @@
       </svg>
       Download
     </span></button>
-  <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#deleteModal"><span>
-      <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <button type="button" style="border-color: black;" class="btn btn-outline-dark delete-btn" data-bs-toggle="modal" data-bs-target="#deleteModal"><span>
+      <svg style="margin-bottom: 3px"  width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
         <g id="SVGRepo_iconCarrier">
@@ -36,9 +51,9 @@
       Delete
     </span></button>
 </div>
-<div class="d-flex" style="gap: 10px" *ngIf="selectedTableItems.length == 0">
-  <button type="button" class="btn btn-outline-dark" [style.background-color]="showStarredOnly ? 'black' : 'white'" [style.color]="showStarredOnly ? 'white' : 'black'" (click)="showStarredOnly = !showStarredOnly"><span>
-      <svg width="18px" height="18px" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+<div class="d-flex" style="gap: 10px;" *ngIf="selectedTableItems.length == 0">
+  <button style="border-color: black;"  type="button" class="btn btn-outline-dark" [ngClass]="{'starred-btn-clicked': showStarredOnly, 'starred-btn': !showStarredOnly}" (click)="showStarredOnly = !showStarredOnly"><span>
+      <svg style="margin-bottom: 3px" width="18px" height="18px" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
         <g id="SVGRepo_iconCarrier">
@@ -70,7 +85,7 @@
     <ng-container *ngFor="let folder of folders">
       <tr *ngIf="!showStarredOnly || (showStarredOnly && folder.isStarred)"
         (mouseenter)="lastHoverIdx = folders.indexOf(folder)" (mouseleave)="lastHoverIdx = -1"
-        [style.background-color]="rowSelected(folder.id) ? 'rgb(221, 240, 252)' : 'transparent'"
+        [style.background-color]="rowSelected(folder.id) || lastHoverIdx == folders.indexOf(folder) ? 'rgb(221, 240, 252)' : 'transparent'"
         (click)="selectSingleRow($event, 'folder', folder.id)">
         <td class="d-flex">
           <div class="form-check" *ngIf="lastHoverIdx == folders.indexOf(folder) || selectedTableItems.length > 0"
@@ -146,7 +161,7 @@
     <ng-container *ngFor="let file of files">
       <tr *ngIf="!showStarredOnly || (showStarredOnly && file.isStarred)"
         (mouseenter)="lastHoverIdx = folders.length + files.indexOf(file)" (mouseleave)="lastHoverIdx = -1"
-        [style.background-color]="rowSelected(file.id) ? 'rgb(221, 240, 252)' : 'transparent'"
+        [style.background-color]="rowSelected(file.id) || lastHoverIdx == folders.length + files.indexOf(file) ? 'rgb(221, 240, 252)' : 'transparent'"
         (click)="selectSingleRow($event, 'folder', file.id)">
         <td class="d-flex">
           <div class="form-check"
@@ -216,3 +231,9 @@
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+  $(function () {
+      $("[rel='tooltip']").tooltip();
+  });
+</script>
