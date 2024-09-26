@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, NgForm, NgModel, Validators } from '@angular/fo
 import { LoginUser } from '../models/login-user';
 import { AuthHttpService } from '../services/auth-service';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -12,6 +13,7 @@ import { Router } from '@angular/router';
 export class LoginComponent {
   signUpAttempted = false;
   showPassword = false;
+  loggingIn = false;
   userForm: FormGroup;
 
   constructor(private authService: AuthHttpService, private router: Router, private fb: FormBuilder) {
@@ -31,10 +33,16 @@ export class LoginComponent {
   login() {
     this.signUpAttempted = true;
     if (this.userForm.valid) {
+      this.loggingIn = true;
       const { email, password } = this.userForm.value;
       const user = new LoginUser(email, password);
-      this.authService.login(user).subscribe({
-        next: () => this.router.navigate(['/']),
+      this.authService.login(user).pipe(
+        finalize(() => this.loggingIn = false)
+      ).subscribe({
+        next: (user) => {
+          localStorage.setItem('currentUser', JSON.stringify(user))
+          this.router.navigate(['/'])
+        },
         error: console.log
       })
     } else {

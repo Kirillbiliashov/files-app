@@ -62,7 +62,12 @@
     </div>
     <button
       style="width: 100%; padding-top: 12px; padding-bottom: 12px; font-weight: 500;font-size: large; border-radius: 15px;"
-      type="submit" class="btn btn-primary">Log in</button>
+      type="submit" class="btn btn-primary" [disabled]="this.loggingIn">
+      <span *ngIf="!this.loggingIn" >Log in</span>
+      <div *ngIf="this.loggingIn" class="spinner-border spinner-border-sm" role="status" style="width: 22px; height: 22px; margin: 0; padding: 0">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </button>
   </form>
   <a class="mt-2" style="font-size: 0.9rem" href="/register">Don't have an account? Sign up</a>
 </div>

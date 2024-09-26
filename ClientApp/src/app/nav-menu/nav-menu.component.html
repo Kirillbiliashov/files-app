@@ -19,23 +19,18 @@
         class="navbar-collapse collapse d-sm-inline-flex justify-content-end"
         [ngClass]="{ show: isExpanded }"
       >
-        <ul class="navbar-nav flex-grow">
-          <li
-            class="nav-item"
-            [routerLinkActive]="['link-active']"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
+        <ul class="navbar-nav flex-grow" >
+          <li class="nav-item" *ngIf="this.currentUser" >
+            <div style="margin-top: 8px; margin-right: 10px;">{{this.currentUser.email}}</div>
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/counter']"
-              >Counter</a
-            >
+          <li class="nav-item" *ngIf="this.currentUser">
+            <a class="nav-link text-dark" style="cursor: pointer;" (click)="logout()">Log out</a>
           </li>
-          <li class="nav-item" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark" [routerLink]="['/fetch-data']"
-              >Fetch data</a
-            >
+          <li class="nav-item" *ngIf="!this.currentUser">
+            <a class="nav-link text-dark" [routerLink]="['/login']">Log in</a>
+          </li>
+          <li class="nav-item" *ngIf="!this.currentUser">
+            <a class="nav-link text-dark" [routerLink]="['/register']">Sign up</a>
           </li>
         </ul>
       </div>

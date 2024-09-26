@@ -45,10 +45,9 @@ namespace FilesApp.Controllers.API
                 return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
             }
 
-            await SetCookies(user);
+            var cookieUser = await SetCookies(user);
 
-            return Ok(new { });
-
+            return Ok(cookieUser);
         }
 
         [HttpPost("login")]
@@ -67,12 +66,12 @@ namespace FilesApp.Controllers.API
                 return Unauthorized();
             }
 
-            await SetCookies(user);
+            var cookieUser = await SetCookies(user);
 
-            return Ok(new { });
+            return Ok(cookieUser);
         }
 
-        private async Task SetCookies(AppUser user)
+        private async Task<CookieUser> SetCookies(AppUser user)
         {
             var cookieUser = new CookieUser
             {
@@ -95,6 +94,8 @@ namespace FilesApp.Controllers.API
                 ExpiresUtc = DateTime.UtcNow.AddMonths(6)
             };
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
+            return cookieUser;
         }
 
         [AllowOnlyAuthorized]
@@ -103,7 +104,7 @@ namespace FilesApp.Controllers.API
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Ok(new { });
+            return Ok();
         }
     }
 }

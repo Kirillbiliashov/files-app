@@ -11,7 +11,7 @@ import { Item } from '../models/item';
   templateUrl: './files-table.component.html',
   styleUrls: ['./files-table.component.css']
 })
-export class FilesTableComponent {
+export class FilesTableComponent implements OnInit {
   @Input() folders: UserFolder[] = [];
   @Input() files: UserFile[] = [];
   @Output() onFilesChange = new EventEmitter();
@@ -24,6 +24,18 @@ export class FilesTableComponent {
 
   constructor(private filesService: FilesHttpService, private itemsService: ItemsHttpService) { }
 
+  ngOnInit(): void {
+    this.loadTooltips();
+  }
+
+  loadTooltips() {
+  //   const tooltipelements: NodeListOf<HTMLElement> =
+  //   document.querySelectorAll("[data-bs-toggle='tooltip']");
+  //   console.log(`loading tooltips tooltips count: ${tooltipelements.length}`)
+  // tooltipelements.forEach((el: HTMLElement) => {
+  //   new (window as any).bootstrap.Tooltip(el);
+  // });
+  }
 
   changeSelection(checked: boolean, type: string, id: string) {
     if (checked) {

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, NgForm, NgModel, Validators } from '@angular/fo
 import { RegisterUser } from '../models/register-user';
 import { AuthHttpService } from '../services/auth-service';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -12,6 +13,7 @@ import { Router } from '@angular/router';
 export class RegisterComponent {
   signUpAttempted = false;
   showPassword = false;
+  signingUp = false;
   userForm: FormGroup;
 
   constructor(private authService: AuthHttpService, private router: Router, private fb: FormBuilder) {
@@ -33,12 +35,19 @@ export class RegisterComponent {
   signUp() {
     this.signUpAttempted = true;
     if (this.userForm.valid) {
+      this.signingUp = true;
       const { firstName, lastName, email, password } = this.userForm.value;
       const newUser = new RegisterUser(firstName, lastName, email, password);
-      this.authService.register(newUser).subscribe({
-        next: () => this.router.navigate(['/']),
-        error: console.log
-      })
+      this.authService.register(newUser).pipe(
+        finalize(() => this.signingUp = false)
+      )
+        .subscribe({
+          next: (user) => {
+            localStorage.setItem('currentUser', JSON.stringify(user))
+            this.router.navigate(['/'])
+          },
+          error: console.log
+        })
     } else {
       console.log('Form is invalid');
     }

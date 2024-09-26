@@ -40,7 +40,12 @@
             </div>
             </div>
           </div>
-        <button style="width: 100%; padding-top: 12px; padding-bottom: 12px; font-weight: 500;font-size: large; border-radius: 15px;" type="submit" class="btn btn-primary">Sign up</button>
+        <button [disabled]="this.signingUp" style="width: 100%; padding-top: 12px; padding-bottom: 12px; font-weight: 500;font-size: large; border-radius: 15px;" type="submit" class="btn btn-primary">
+          <span *ngIf="!this.signingUp" >Sign up</span>
+          <div *ngIf="this.signingUp" class="spinner-border spinner-border-sm" role="status" style="width: 22px; height: 22px; margin: 0; padding: 0">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </button>
       </form>
 </div>
 

@@ -59,7 +59,7 @@
 </div>
 <div class="d-flex" style="gap: 10px;" *ngIf="selectedTableItems.length == 0">
   <button style="border-color: black;" type="button" class="btn btn-outline-dark"
-    [ngClass]="{'starred-btn-clicked': showStarredOnly, 'starred-btn': !showStarredOnly}"
+    [ngClass]="{'starred-btn-clicked': showStarredOnly, 'starred-btn': !showStarredOnly}" data-bs-toggle='tooltip' data-bs-placement="top" title="Remove from starred" 
     (click)="showStarredOnly = !showStarredOnly"><span>
       <svg style="margin-bottom: 3px" width="18px" height="18px" viewBox="0 0 24 24" fill="white"
         xmlns="http://www.w3.org/2000/svg">
@@ -135,7 +135,7 @@
             </g>
           </svg>
           <a [href]="'/folders/' + folder.id">{{folder.name}}</a>
-          <svg *ngIf="!folder.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer"
+          <svg *ngIf="!folder.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to starred" 
             (click)="$event.stopPropagation(); changeStarredState(folder, 'folder')" width="22px" height="22px"
             viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -146,7 +146,7 @@
                 stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
             </g>
           </svg>
-          <svg *ngIf="folder.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer"
+          <svg *ngIf="folder.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Remove from starred" 
             (click)="$event.stopPropagation(); changeStarredState(folder, 'folder')" width="22px" height="22px"
             viewBox="0 0 24 24" fill="yellow" xmlns="http://www.w3.org/2000/svg">
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -185,7 +185,7 @@
           </a>
           <svg *ngIf="!file.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer"
             (click)="$event.stopPropagation(); changeStarredState(file, 'file')" width="22px" height="22px"
-            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to starred" >
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
             <g id="SVGRepo_iconCarrier">
@@ -194,7 +194,7 @@
                 stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
             </g>
           </svg>
-          <svg *ngIf="file.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer"
+          <svg *ngIf="file.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer" data-bs-toggle='tooltip' data-bs-placement="top" title="Remove from starred" 
             (click)="$event.stopPropagation(); changeStarredState(file, 'file')" width="22px" height="22px"
             viewBox="0 0 24 24" fill="yellow" xmlns="http://www.w3.org/2000/svg">
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -240,3 +240,9 @@
     </div>
   </div>
 </div>
+<script>
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+  </script>
