@@ -49,6 +49,7 @@ namespace FilesApp.Controllers
                 {
                     f.Id,
                     f.Name,
+                    f.NameIdx,
                     size = _foldersRepository.GetSize(UserId, f.Id),
                     lastModified = _foldersRepository.GetLastModified(UserId, f.Id),
                     f.IsStarred

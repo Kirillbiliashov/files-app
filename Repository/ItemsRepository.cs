@@ -12,7 +12,7 @@ namespace FilesApp.Repository
 {
     public class ItemsRepository : BaseRepository<Item>, IItemsRepository
     {
-        private const string _allItemsQuery = "SELECT Id, Discriminator, FolderId, IsStarred, Name, NULL AS Content, LastModified, Size, UserId FROM Items WHERE FolderId IS NULL AND UserId = @UserId";
+        private const string _allItemsQuery = "SELECT Id, Discriminator, FolderId, IsStarred, Name, NULL AS Content, LastModified, Size, UserId, NameIdx FROM Items WHERE FolderId IS NULL AND UserId = @UserId";
 
         public ItemsRepository(FilesAppDbContext context) : base(context)
         {

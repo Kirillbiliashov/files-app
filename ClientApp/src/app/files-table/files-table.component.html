@@ -92,10 +92,12 @@
   </thead>
   <tbody>
     <ng-container *ngFor="let folder of folders">
-      <tr *ngIf="!showStarredOnly || (showStarredOnly && folder.isStarred)"
-        (mouseenter)="lastHoverIdx = folders.indexOf(folder)" (mouseleave)="lastHoverIdx = -1"
-        [style.background-color]="rowSelected(folder.id) || lastHoverIdx == folders.indexOf(folder) ? '#f0f0f0' : 'transparent'"
-        (click)="selectSingleRow($event, 'folder', folder.id)">
+      <tr 
+      *ngIf="!showStarredOnly || (showStarredOnly && folder.isStarred)"
+      (mouseenter)="lastHoverIdx = folders.indexOf(folder)" 
+      (mouseleave)="lastHoverIdx = -1"
+      [style.background-color]="rowSelected(folder.id) || lastHoverIdx == folders.indexOf(folder) ? '#f0f0f0' : 'transparent'"
+      (click)="selectSingleRow($event, 'folder', folder.id)">
         <td class="d-flex">
           <div class="form-check" *ngIf="lastHoverIdx == folders.indexOf(folder) || selectedTableItems.length > 0"
             style="position: absolute; left: 80px; margin: 0; padding: 0; z-index: 2;">
@@ -134,7 +136,7 @@
               </g>
             </g>
           </svg>
-          <a [href]="'/folders/' + folder.id">{{folder.name}}</a>
+          <a [href]="'/folders/' + folder.id">{{folder.nameIdx == 0 ? folder.name : folder.name + ' (' + folder.nameIdx + ')'}}</a>
           <svg *ngIf="!folder.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to starred" 
             (click)="$event.stopPropagation(); changeStarredState(folder, 'folder')" width="22px" height="22px"
             viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

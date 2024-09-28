@@ -7,7 +7,8 @@ export class UserFolder extends Item {
         public name: string,
         public size: number,
         public lastModified: number,
-        public isStarred: boolean
+        public isStarred: boolean,
+        public nameIdx: number
     ) {
         super();
     }

@@ -53,8 +53,11 @@ namespace FilesApp.Repository
         override public Folder? Get(string userId, string id) =>
         _context.Items.Where(i => i.UserId == userId && i.Id == id).OfType<Folder>().Include(f => f.Items).FirstOrDefault();
 
-        public int GetCount(string userId, string name) =>
-         _context.Items.OfType<Folder>().Where(f => f.UserId == userId && f.Name == name).Count();
+        public Folder? GetByName(string userId, string name, string? parentId) => 
+        _context.Items.Where(i => i.UserId == userId && i.FolderId == parentId && i.Name == name)
+        .OfType<Folder>()
+        .OrderByDescending(i => i.NameIdx)
+        .FirstOrDefault();
 
         public string? GetFolderIdByName(string userId, string name, bool isFolderAdded)
         {

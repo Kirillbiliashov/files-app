@@ -49,14 +49,13 @@ namespace FilesApp.Controllers
         [HttpPost("")]
         public async Task<IActionResult> CreateNewFolder([FromBody] CreateFolderBody body)
         {
-            var foldersCount = _foldersRepository.GetCount(UserId, body.Name);
-
-            var folderName = foldersCount > 0 ? $"{body.Name} ({foldersCount})" : body.Name;
+            var existingFolder = _foldersRepository.GetByName(UserId, body.Name, body.FolderId);
             var newFolder = new Folder
             {
                 UserId = UserId,
-                Name = folderName,
-                FolderId = body.FolderId
+                Name = body.Name,
+                FolderId = body.FolderId,
+                NameIdx = existingFolder == null ? 0 : existingFolder.NameIdx + 1
             };
             _foldersRepository.Add(newFolder);
             await _foldersRepository.SaveAsync();

@@ -22,10 +22,14 @@ export class FolderComponent implements OnInit {
     });
   }
 
+  get enclosingFolderName(): string {
+    return this.fodlerData?.folder?.nameIdx == 0 ? this.fodlerData?.folder?.name : this.fodlerData?.folder?.name + ' (' + this.fodlerData?.folder?.nameIdx + ')'
+  }
+
   loadFolderData() {
     if (this.folderId) {
       this.foldersService.getFolderData(this.folderId)
-      .subscribe(data => this.fodlerData = data);
+        .subscribe(data => this.fodlerData = data);
     }
   }
 

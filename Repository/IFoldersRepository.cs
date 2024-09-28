@@ -12,7 +12,7 @@ namespace FilesApp.Repository
 
         long GetSize(string userId, string id);
 
-        int GetCount(string userId, string name);
+        Folder? GetByName(string userId, string name, string? parentId);
 
         long? GetLastModified(string userId, string id);
 

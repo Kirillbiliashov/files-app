@@ -6,7 +6,7 @@
 <app-files-actions (onFileUpload)="loadFolderData()"></app-files-actions>
   
   <h5 style="margin-top: 50px" >All files</h5>
-  <h3 *ngIf="fodlerData?.folder">{{fodlerData?.folder?.name}}</h3>
+  <h3 *ngIf="fodlerData?.folder">{{this.enclosingFolderName}}</h3>
   <ng-container *ngIf="fodlerData">
     <app-files-table [files]="fodlerData.files" [folders]="fodlerData.subfolders"></app-files-table>
     
