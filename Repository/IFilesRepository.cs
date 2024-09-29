@@ -8,5 +8,6 @@ namespace FilesApp.Repository
 {
     public interface IFilesRepository: IRepository<UserFile>
     {
+        List<string> GetExistingFilesHashes(string userId, IEnumerable<string> newHashes);
     }
 }

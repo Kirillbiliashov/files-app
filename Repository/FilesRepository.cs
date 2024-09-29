@@ -22,6 +22,14 @@ namespace FilesApp.Repository
          .Select(f => new UserFile { Name = f.Name, Content = f.Content })
          .AsNoTracking()
          .FirstOrDefault();
-         
+
+        public List<string> GetExistingFilesHashes(string userId, IEnumerable<string> newHashes) =>
+        _context.Items
+        .AsNoTracking()
+        .OfType<UserFile>()
+        .Where(f => f.UserId == userId && newHashes.Contains(f.Hash))
+        .Select(f => f.Hash)
+        .ToList();
+
     }
 }

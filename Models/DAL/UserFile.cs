@@ -10,6 +10,8 @@ namespace FilesApp.Models.DAL
     {
         public long Size { get; set; }
 
+        public string Hash { get; set; }
+
         public long LastModified { get; set; }
 
         [JsonIgnore]
