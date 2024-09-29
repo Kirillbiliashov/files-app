@@ -48,13 +48,22 @@ namespace FilesApp.Repository
         }
 
         public bool ExistsByName(string userId, string name) =>
-         _context.Items.OfType<Folder>().Any(i => i.UserId == userId && i.Name == name);
+         _context.Items
+         .OfType<Folder>()
+         .Any(i => i.UserId == userId && i.Name == name);
 
         override public Folder? Get(string userId, string id) =>
-        _context.Items.Where(i => i.UserId == userId && i.Id == id).OfType<Folder>().Include(f => f.Items).FirstOrDefault();
+        _context.Items
+        .AsNoTracking()
+        .Where(i => i.UserId == userId && i.Id == id)
+        .OfType<Folder>()
+        .Include(f => f.Items)
+        .FirstOrDefault();
 
-        public Folder? GetByName(string userId, string name, string? parentId) => 
-        _context.Items.Where(i => i.UserId == userId && i.FolderId == parentId && i.Name == name)
+        public Folder? GetByName(string userId, string name, string? parentId) =>
+        _context.Items
+        .AsNoTracking()
+        .Where(i => i.UserId == userId && i.FolderId == parentId && i.Name == name)
         .OfType<Folder>()
         .OrderByDescending(i => i.NameIdx)
         .FirstOrDefault();
@@ -97,7 +106,6 @@ namespace FilesApp.Repository
 
         public long GetSize(string userId, string id)
         {
-            Console.WriteLine($"GetSize, user id: {userId}, folder id: {id}");
             var paramsDict = new Dictionary<string, object>
             {
                 {"UserId", userId},

@@ -64,13 +64,23 @@ namespace FilesApp.Repository
         }
 
         public virtual T? Get(string userId, string id) =>
-         _context.Set<T>().Where(e => e.Id == id).FirstOrDefault();
+         _context.Set<T>()
+         .Where(e => e.Id == id)
+         .AsNoTracking()
+         .FirstOrDefault();
 
 
-        public List<T> GetAll(string userId) => _context.Set<T>().Where(i => i.UserId == userId).ToList();
+        public List<T> GetAll(string userId) => 
+        _context.Set<T>()
+        .Where(i => i.UserId == userId)
+        .AsNoTracking()
+        .ToList();
 
         public List<T> GetAll(string userId, List<string> ids) =>
-         _context.Set<T>().Where(e => e.UserId == userId && ids.Contains(e.Id)).ToList();
+         _context.Set<T>()
+         .Where(e => e.UserId == userId && ids.Contains(e.Id))
+         .AsNoTracking()
+         .ToList();
 
         public async Task<int> SaveAsync() => await _context.SaveChangesAsync();
 

@@ -29,7 +29,10 @@ namespace FilesApp.Repository
             .ToList();
 
         public List<Item> GetAllByFolderIds(string userId, IEnumerable<string> ids) =>
-        _context.Items.Where(i => i.UserId == userId && i.FolderId != null && ids.Contains(i.FolderId)).ToList();
+        _context.Items
+        .AsNoTracking()
+        .Where(i => i.UserId == userId && i.FolderId != null && ids.Contains(i.FolderId))
+        .ToList();
 
         public List<Item> GetTopLevelItems(string userId)
         {
