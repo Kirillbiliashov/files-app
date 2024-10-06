@@ -58,4 +58,8 @@ export class RegisterComponent {
     return control ? control.invalid && (control.touched || this.signUpAttempted) : false;
   }
 
+  loginWithGoogle() {
+    window.location.href = '/api/auth/login/google';
+  }
+
 }

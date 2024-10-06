@@ -15,6 +15,7 @@ import { FilesActionsComponent } from './files-actions/files-actions.component';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { GoogleAuthCallbackComponent } from './google-auth-callback/google-auth-callback.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     FilesTableComponent,
     FilesActionsComponent,
     RegisterComponent,
-    LoginComponent
+    LoginComponent,
+    GoogleAuthCallbackComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -37,6 +39,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'folders/:id', component: FolderComponent },
       { path: 'register', component: RegisterComponent },
+      { path: 'auth/google/callback', component: GoogleAuthCallbackComponent },
       { path: 'login', component: LoginComponent },
     ]),
     ReactiveFormsModule

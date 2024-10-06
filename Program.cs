@@ -10,6 +10,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+
+builder.Services.AddCors(options =>
+  {
+      options.AddPolicy("AllowLocalhost",
+          builder => builder.WithOrigins("https://localhost:44485")
+                            .AllowAnyMethod()
+                            .AllowAnyHeader());
+  });
+
 builder.Services.AddControllers()
 .AddJsonOptions(x =>
    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
@@ -27,7 +36,14 @@ builder.Services.AddDbContext<FilesAppDbContext>(o =>
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-}).AddCookie(o => o.LoginPath = "/register");
+})
+.AddGoogle(options =>
+{
+    IConfigurationSection googleAuthSection = builder.Configuration.GetSection("Authentication:Google");
+    options.ClientId = googleAuthSection["ClientId"];
+    options.ClientSecret = googleAuthSection["ClientSecret"];
+})
+.AddCookie(o => o.LoginPath = "/register");
 
 builder.Services.AddScoped<IFilesRepository, FilesRepository>();
 builder.Services.AddScoped<IFoldersRepository, FoldersRepository>();
@@ -45,7 +61,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
+app.UseCors("AllowLocalhost");
 
 app.MapControllerRoute(
     name: "default",
