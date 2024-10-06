@@ -16,10 +16,6 @@ export class AuthHttpService {
         return this.client.post<CookieUser>('api/auth/login', user);
     }
 
-    initiateGoogleLogin() {
-        return this.client.get('api/auth/login/google');
-    }
-
     processGoogleLogin(code: string) {
         return this.client.post<any>('api/auth/login/google/process', { code: code });
     }

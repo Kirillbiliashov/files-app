@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using FilesApp.BL;
 using FilesApp.DAL;
 using FilesApp.Models.DAL;
 using FilesApp.Repository;
@@ -9,15 +10,6 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-
-builder.Services.AddCors(options =>
-  {
-      options.AddPolicy("AllowLocalhost",
-          builder => builder.WithOrigins("https://localhost:44485")
-                            .AllowAnyMethod()
-                            .AllowAnyHeader());
-  });
 
 builder.Services.AddControllers()
 .AddJsonOptions(x =>
@@ -48,6 +40,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IFilesRepository, FilesRepository>();
 builder.Services.AddScoped<IFoldersRepository, FoldersRepository>();
 builder.Services.AddScoped<IItemsRepository, ItemsRepository>();
+builder.Services.AddSingleton<GoogleSignInManager>();
 
 var app = builder.Build();
 
