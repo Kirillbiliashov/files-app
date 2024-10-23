@@ -10,7 +10,8 @@ const PROXY_CONFIG = [
       "/api/files",
       "/api/folders",
       "/api/items",
-      "/api/auth"
+      "/api/auth",
+      "/api/shared-links"
    ],
     proxyTimeout: 10000,
     target: target,

@@ -29,4 +29,9 @@ export class FilesHttpService {
 
         return this.client.post('api/files/upload', formData)
     }
+
+    createFileLink(fileId: string) {
+        return this.client.post<{linkId: string}>(`api/shared-links/create/${fileId}`, {});
+    }
+
 }

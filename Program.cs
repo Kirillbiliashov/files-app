@@ -40,6 +40,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IFilesRepository, FilesRepository>();
 builder.Services.AddScoped<IFoldersRepository, FoldersRepository>();
 builder.Services.AddScoped<IItemsRepository, ItemsRepository>();
+builder.Services.AddScoped<ISharedLinkRepository, SharedLinkRepository>();
 builder.Services.AddSingleton<GoogleSignInManager>();
 
 var app = builder.Build();

@@ -13,6 +13,8 @@ namespace FilesApp.DAL
 
         public DbSet<Item> Items { get; set; }
 
+        public DbSet<SharedLink> SharedLinks { get; set; }
+
         public FilesAppDbContext(DbContextOptions<FilesAppDbContext> options) : base(options) { }
 
 

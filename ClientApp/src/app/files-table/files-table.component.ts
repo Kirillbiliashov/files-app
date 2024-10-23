@@ -22,6 +22,9 @@ export class FilesTableComponent implements OnInit {
   selectedTableItems: SelectedItem[] = [];
   showStarredOnly: boolean = false;
 
+  createLinkFile: UserFile | null  = null;
+  createdLink: string | null = null;
+
   constructor(private filesService: FilesHttpService, private itemsService: ItemsHttpService) { }
 
   ngOnInit(): void {
@@ -107,6 +110,17 @@ export class FilesTableComponent implements OnInit {
         next: () => item.isStarred = true
       });
     }
+  }
+
+  createFileLink(file: UserFile) {
+    this.createLinkFile = file;
+    this.filesService.createFileLink(file.id).subscribe({
+      next: (response) => {
+        this.createdLink = `https://${window.location.host}/api/files/shared/${response.linkId}`
+        console.log(`createdLink: ${this.createdLink}`)
+      },
+      error: (e) => console.log(e)
+    })
   }
 
 }

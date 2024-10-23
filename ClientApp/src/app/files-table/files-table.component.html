@@ -26,6 +26,28 @@
     color: black;
   }
 
+  .link-icon {
+    cursor: pointer;
+    padding: 4px
+  }
+
+  .link-icon:hover {
+    background-color: rgb(200, 199, 199);
+    border-radius: 5px;
+  }
+
+  .create-link-container {
+    position: absolute;
+    padding: 10px;
+    width: 300px;
+
+    background-color: white;
+    border: 0.5px solid rgb(13, 13, 13);
+    border-radius: 15px;
+    bottom: -60px; 
+    right: 0
+  }
+
 </style>
 <div class="d-flex" style="gap: 10px" *ngIf="selectedTableItems.length > 0">
   <button type="button" style="border-color: black;" class="btn btn-outline-dark download-btn"
@@ -74,7 +96,8 @@
       Starred
     </span></button>
 </div>
-<table class="table">
+
+<table class="table" >
   <thead>
     <tr (mouseenter)="headerHovered = true" (mouseleave)="headerHovered = false">
       <th scope="col">
@@ -98,7 +121,7 @@
       (mouseleave)="lastHoverIdx = -1"
       [style.background-color]="rowSelected(folder.id) || lastHoverIdx == folders.indexOf(folder) ? '#f0f0f0' : 'transparent'"
       (click)="selectSingleRow($event, 'folder', folder.id)">
-        <td class="d-flex">
+        <td class="d-flex" >
           <div class="form-check" *ngIf="lastHoverIdx == folders.indexOf(folder) || selectedTableItems.length > 0"
             style="position: absolute; left: 80px; margin: 0; padding: 0; z-index: 2;">
             <input #checkbox class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
@@ -161,11 +184,11 @@
           </svg>
         </td>
 
-        <td>
+        <td >
           {{ folder.size}}
         </td>
-        <td>
-          {{ folder.lastModified| date:'medium' }}
+        <td  >
+        {{ folder.lastModified| date:'medium' }}
         </td>
       </tr>
     </ng-container>
@@ -174,7 +197,7 @@
         (mouseenter)="lastHoverIdx = folders.length + files.indexOf(file)" (mouseleave)="lastHoverIdx = -1"
         [style.background-color]="rowSelected(file.id) || lastHoverIdx == folders.length + files.indexOf(file) ? '#f0f0f0' : 'transparent'"
         (click)="selectSingleRow($event, 'folder', file.id)">
-        <td class="d-flex">
+        <td class="d-flex" >
           <div class="form-check"
             *ngIf="lastHoverIdx == (folders.length + files.indexOf(file)) || selectedTableItems.length > 0"
             style="position: absolute; left: 80px; margin: 0; padding: 0; z-index: 2;">
@@ -208,11 +231,23 @@
             </g>
           </svg>
         </td>
-        <td>
+        <td >
           {{ file.size }}
         </td>
-        <td>
+        <td class="d-flex align-items-end" style="width: 100%; position: relative">
           {{ file.lastModified | date:'medium' }}
+          <div style="position: relative;">
+            <svg (click)="createFileLink(file)" class="link-icon" *ngIf="lastHoverIdx == folders.length + files.indexOf(file)" style="margin-left: 8px; " width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.197 3.35462C16.8703 1.67483 19.4476 1.53865 20.9536 3.05046C22.4596 4.56228 22.3239 7.14956 20.6506 8.82935L18.2268 11.2626M10.0464 14C8.54044 12.4882 8.67609 9.90087 10.3494 8.22108L12.5 6.06212" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path> <path d="M13.9536 10C15.4596 11.5118 15.3239 14.0991 13.6506 15.7789L11.2268 18.2121L8.80299 20.6454C7.12969 22.3252 4.55237 22.4613 3.0464 20.9495C1.54043 19.4377 1.67609 16.8504 3.34939 15.1706L5.77323 12.7373" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
+            <div *ngIf="file == createLinkFile" class="create-link-container">
+              <p *ngIf="!this.createdLink" style="margin: 0; padding: 0">Getting the link...</p>
+              <div *ngIf="this.createdLink" class="d-flex flex-column">
+                <div class="d-flex">
+                  <p style="margin: 0; padding: 0">Copy link</p>
+                </div>
+                <input type="text" id="link" name="link" [value]="this.createdLink" readonly>
+              </div>
+            </div>
+          </div>
         </td>
       </tr>
     </ng-container>

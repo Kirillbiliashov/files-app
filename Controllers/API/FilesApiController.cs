@@ -28,12 +28,14 @@ namespace FilesApp.Controllers
         private readonly IItemsRepository _itemsRepository;
         private readonly IFoldersRepository _foldersRepository;
         private readonly IFilesRepository _filesRepository;
+        private readonly ISharedLinkRepository _sharedLinkRepository;
 
-        public FilesApiController(IItemsRepository itemsRepository, IFoldersRepository foldersRepository, IFilesRepository filesRepository)
+        public FilesApiController(IItemsRepository itemsRepository, IFoldersRepository foldersRepository, IFilesRepository filesRepository, ISharedLinkRepository sharedLinkRepository)
         {
             _itemsRepository = itemsRepository;
             _foldersRepository = foldersRepository;
             _filesRepository = filesRepository;
+            _sharedLinkRepository = sharedLinkRepository;
         }
 
 
@@ -169,6 +171,23 @@ namespace FilesApp.Controllers
                 return NotFound();
             }
 
+            return GetFileContent(file);
+        }
+
+        [HttpGet("shared/{id}")]
+        public async Task<IActionResult> OpenSharedFile(string id)
+        {
+            var sharedLink = _sharedLinkRepository.Get(UserId, id);
+            if (sharedLink == null)
+            {
+                return NotFound();
+            }
+
+            return GetFileContent(sharedLink.Item);
+        }
+
+        private FileContentResult GetFileContent(UserFile file)
+        {
             Response.Headers.Add("Content-Disposition", "inline; filename=" + file.Name);
             string contentType = MimeUtility.GetMimeMapping(file.Name);
 
