@@ -175,6 +175,7 @@ namespace FilesApp.Controllers
         }
 
         [HttpGet("shared/{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> OpenSharedFile(string id)
         {
             var sharedLink = _sharedLinkRepository.Get(UserId, id);

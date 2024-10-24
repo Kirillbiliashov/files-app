@@ -12,9 +12,7 @@ namespace FilesApp.Controllers.API
 {
     public class BaseApiController : ControllerBase
     {
-        protected string UserId
-        {
-            get => JsonSerializer.Deserialize<CookieUser>(User.FindFirst("CookieUser")?.Value)?.Id;
-        }
+        protected string? UserId => 
+        User.Identity.IsAuthenticated ? JsonSerializer.Deserialize<CookieUser>(User.FindFirst("CookieUser")?.Value)?.Id : null;
     }
 }
