@@ -39,13 +39,28 @@
   .create-link-container {
     position: absolute;
     padding: 10px;
-    width: 300px;
+    width: 350px;
 
     background-color: white;
     border: 0.5px solid rgb(13, 13, 13);
     border-radius: 15px;
-    bottom: -60px; 
+    bottom: -80px; 
     right: 0
+  }
+
+  input[type="checkbox"] {
+    transform: scale(1.2);
+  }
+
+  input[type="checkbox"]:focus{
+        outline: none !important;
+        -webkit-appearance: none;
+        box-shadow: none !important;
+    }
+
+  .checkbox-table-row {
+    width: 35px;
+     border: none !important
   }
 
 </style>
@@ -80,10 +95,10 @@
     </span></button>
 </div>
 <div class="d-flex" style="gap: 10px;" *ngIf="selectedTableItems.length == 0">
-  <button style="border-color: black;" type="button" class="btn btn-outline-dark"
+  <button style="border-color: black;" type="button" class="btn btn-outline-dark delete-btn"
     [ngClass]="{'starred-btn-clicked': showStarredOnly, 'starred-btn': !showStarredOnly}" data-bs-toggle='tooltip' data-bs-placement="top" title="Remove from starred" 
     (click)="showStarredOnly = !showStarredOnly"><span>
-      <svg style="margin-bottom: 3px" width="18px" height="18px" viewBox="0 0 24 24" fill="white"
+      <svg style="margin-bottom: 3px" width="16px" height="16px" viewBox="0 0 24 24" fill="white"
         xmlns="http://www.w3.org/2000/svg">
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -100,17 +115,15 @@
 <table class="table" >
   <thead>
     <tr (mouseenter)="headerHovered = true" (mouseleave)="headerHovered = false">
-      <th scope="col">
-        <div class="form-check" style="position: absolute; left: 80px; margin: 0; padding: 0; z-index: 2;"
-          *ngIf="headerHovered || selectedTableItems.length > 0">
-          <input #headerCheckbox class="form-check-input" type="checkbox" [checked]="selectedTableItems.length > 0"
-            (change)="changeAllFilesSelection(headerCheckbox.checked)" id="flexCheckIndeterminate"
-            style="transform: scale(1.3);">
-        </div>
+      <th scope="col checkbox-table-row" style="border: none !important">
+        <input #headerCheckbox class="form-check-input" type="checkbox" [checked]="selectedTableItems.length > 0"
+        (change)="changeAllFilesSelection(headerCheckbox.checked)" id="flexCheckIndeterminate" *ngIf="headerHovered || selectedTableItems.length > 0">
+      </th>
+      <th scope="col" style="width: 65%;">
         <span>Name</span>
       </th>
-      <th scope="col">Length</th>
-      <th scope="col">Modified</th>
+      <th scope="col" style="width: 10%;">Length</th>
+      <th scope="col"  style="max-width: calc(25% - 30px);">Modified</th>
     </tr>
   </thead>
   <tbody>
@@ -121,13 +134,12 @@
       (mouseleave)="lastHoverIdx = -1"
       [style.background-color]="rowSelected(folder.id) || lastHoverIdx == folders.indexOf(folder) ? '#f0f0f0' : 'transparent'"
       (click)="selectSingleRow($event, 'folder', folder.id)">
-        <td class="d-flex" >
-          <div class="form-check" *ngIf="lastHoverIdx == folders.indexOf(folder) || selectedTableItems.length > 0"
-            style="position: absolute; left: 80px; margin: 0; padding: 0; z-index: 2;">
-            <input #checkbox class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
-              (click)="$event.stopPropagation()" (change)="changeSelection(checkbox.checked, 'folder', folder.id)"
-              [checked]="rowSelected(folder.id)" style="transform: scale(1.3);">
-          </div>
+      <td class="checkbox-table-row">
+        <input  #checkbox class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
+        (click)="$event.stopPropagation()" (change)="changeSelection(checkbox.checked, 'folder', folder.id)"
+        [checked]="rowSelected(folder.id)" *ngIf="lastHoverIdx == folders.indexOf(folder) || selectedTableItems.length > 0"/>
+      </td>
+        <td class="d-flex" style="max-width: 65%" >
           <svg width="20px" height="20px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000">
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -197,14 +209,13 @@
         (mouseenter)="lastHoverIdx = folders.length + files.indexOf(file)" (mouseleave)="lastHoverIdx = -1"
         [style.background-color]="rowSelected(file.id) || lastHoverIdx == folders.length + files.indexOf(file) ? '#f0f0f0' : 'transparent'"
         (click)="selectSingleRow($event, 'folder', file.id)">
-        <td class="d-flex" >
-          <div class="form-check"
-            *ngIf="lastHoverIdx == (folders.length + files.indexOf(file)) || selectedTableItems.length > 0"
-            style="position: absolute; left: 80px; margin: 0; padding: 0; z-index: 2;">
-            <input #checkbox class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
-              (click)="$event.stopPropagation()" (change)="changeSelection(checkbox.checked, 'file', file.id)"
-              [checked]="rowSelected(file.id)" style="transform: scale(1.3);">
-          </div>
+        <td class="checkbox-table-row">
+          <input #checkbox class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
+          (click)="$event.stopPropagation()" (change)="changeSelection(checkbox.checked, 'file', file.id)"
+          style="margin-top: 8px !important"
+          [checked]="rowSelected(file.id)"  *ngIf="lastHoverIdx == (folders.length + files.indexOf(file)) || selectedTableItems.length > 0"/>
+        </td>
+        <td class="d-flex" style="width: 100%;" >
           <a [href]="'/api/files/open/' + file.id" target="_blank">
             {{ file.name }}
           </a>
@@ -231,20 +242,24 @@
             </g>
           </svg>
         </td>
-        <td >
-          {{ file.size }}
+        <td style="max-width: 10%;">
+          <span style="margin: 0; padding: 0; margin-top: 10px !important">{{ file.size }}</span>
         </td>
-        <td class="d-flex align-items-end" style="width: 100%; position: relative">
-          {{ file.lastModified | date:'medium' }}
-          <div style="position: relative;">
-            <svg (click)="createFileLink(file)" class="link-icon" *ngIf="lastHoverIdx == folders.length + files.indexOf(file)" style="margin-left: 8px; " width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.197 3.35462C16.8703 1.67483 19.4476 1.53865 20.9536 3.05046C22.4596 4.56228 22.3239 7.14956 20.6506 8.82935L18.2268 11.2626M10.0464 14C8.54044 12.4882 8.67609 9.90087 10.3494 8.22108L12.5 6.06212" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path> <path d="M13.9536 10C15.4596 11.5118 15.3239 14.0991 13.6506 15.7789L11.2268 18.2121L8.80299 20.6454C7.12969 22.3252 4.55237 22.4613 3.0464 20.9495C1.54043 19.4377 1.67609 16.8504 3.34939 15.1706L5.77323 12.7373" stroke="#000000" stroke-width="1.5" stroke-linecap="round"></path> </g></svg>
+        <td class="d-flex align-items-end" style="max-width: calc(100% - 30px); position: relative; ">
+          <span >
+            {{ file.lastModified | date:'medium' }}
+          </span>
+          <div style="position: relative;  margin-left: 8px; height: 28px; width: 28px" class="link-icon">
+              <svg  (click)="createFileLink(file)" style=" margin: 0; margin-bottom: 8px" *ngIf="lastHoverIdx == folders.length + files.indexOf(file)"   width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.4800000000000001"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.7285 3.88396C17.1629 2.44407 19.2609 2.41383 20.4224 3.57981C21.586 4.74798 21.5547 6.85922 20.1194 8.30009L17.6956 10.7333C17.4033 11.0268 17.4042 11.5017 17.6976 11.794C17.9911 12.0863 18.466 12.0854 18.7583 11.7919L21.1821 9.35869C23.0934 7.43998 23.3334 4.37665 21.4851 2.5212C19.6346 0.663551 16.5781 0.905664 14.6658 2.82536L9.81817 7.69182C7.90688 9.61053 7.66692 12.6739 9.51519 14.5293C9.80751 14.8228 10.2824 14.8237 10.5758 14.5314C10.8693 14.2391 10.8702 13.7642 10.5779 13.4707C9.41425 12.3026 9.44559 10.1913 10.8809 8.75042L15.7285 3.88396Z" fill="#000000"></path> <path d="M14.4851 9.47074C14.1928 9.17728 13.7179 9.17636 13.4244 9.46868C13.131 9.76101 13.1301 10.2359 13.4224 10.5293C14.586 11.6975 14.5547 13.8087 13.1194 15.2496L8.27178 20.1161C6.83745 21.556 4.73937 21.5863 3.57791 20.4203C2.41424 19.2521 2.44559 17.1408 3.88089 15.6999L6.30473 13.2667C6.59706 12.9732 6.59614 12.4984 6.30268 12.206C6.00922 11.9137 5.53434 11.9146 5.24202 12.2081L2.81818 14.6413C0.906876 16.5601 0.666916 19.6234 2.51519 21.4789C4.36567 23.3365 7.42221 23.0944 9.33449 21.1747L14.1821 16.3082C16.0934 14.3895 16.3334 11.3262 14.4851 9.47074Z" fill="#000000"></path> </g></svg>
+       
             <div *ngIf="file == createLinkFile" class="create-link-container">
               <p *ngIf="!this.createdLink" style="margin: 0; padding: 0">Getting the link...</p>
               <div *ngIf="this.createdLink" class="d-flex flex-column">
-                <div class="d-flex">
-                  <p style="margin: 0; padding: 0">Copy link</p>
+                <div class="d-flex justify-content-between">
+                  <p style="margin: 0; padding: 0;">Copy link</p>
+                  <span aria-hidden="true" style="transform: scale(1.4);" (click)="this.createdLink = null; this.createLinkFile = null">&times;</span>
                 </div>
-                <input type="text" id="link" name="link" [value]="this.createdLink" readonly>
+                <input style="margin-top: 5px" type="text" id="link" name="link" [value]="this.createdLink" readonly>
               </div>
             </div>
           </div>
