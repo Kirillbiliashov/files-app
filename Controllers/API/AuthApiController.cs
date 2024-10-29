@@ -90,26 +90,27 @@ namespace FilesApp.Controllers.API
             var accessCode = await _googleSignInManager.GetAccessCode(body.code);
             var payload = await GoogleJsonWebSignature.ValidateAsync(accessCode);
 
-            if (payload != null)
+            if (payload == null)
             {
-                var user = await _userManager.FindByEmailAsync(payload.Email);
-                if (user == null)
+                return Unauthorized();
+            }
+            
+            var user = await _userManager.FindByEmailAsync(payload.Email);
+            if (user == null)
+            {
+                user = new AppUser
                 {
-                    user = new AppUser
-                    {
-                        UserName = payload.Email.Split("@").FirstOrDefault(),
-                        FirstName = payload.GivenName,
-                        LastName = payload.FamilyName,
-                        Email = payload.Email
-                    };
-                    await _userManager.CreateAsync(user);
-                }
-
-                var cookieUser = await SetCookies(user);
-                return Ok(cookieUser);
+                    UserName = payload.Email.Split("@").FirstOrDefault(),
+                    FirstName = payload.GivenName,
+                    LastName = payload.FamilyName,
+                    Email = payload.Email
+                };
+                await _userManager.CreateAsync(user);
             }
 
-            return Unauthorized();
+            var cookieUser = await SetCookies(user);
+            return Ok(cookieUser);
+
         }
 
         private async Task<CookieUser> SetCookies(AppUser user)

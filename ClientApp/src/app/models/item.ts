@@ -5,4 +5,5 @@ export abstract class Item {
     abstract size: number;
     abstract lastModified: number;
     abstract isStarred: boolean;
+    type?: string;
 }

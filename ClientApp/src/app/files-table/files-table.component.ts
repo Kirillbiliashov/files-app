@@ -22,23 +22,25 @@ export class FilesTableComponent implements OnInit {
   selectedTableItems: SelectedItem[] = [];
   showStarredOnly: boolean = false;
 
-  createLinkFile: UserFile | null  = null;
+  createLinkFile: Item | null = null;
   createdLink: string | null = null;
+
+  tableItems: Item[] = [];
 
   constructor(private filesService: FilesHttpService, private itemsService: ItemsHttpService) { }
 
   ngOnInit(): void {
-    this.loadTooltips();
+    this.folders.forEach(f => {
+      f.type = 'folder';
+      f.name = f.nameIdx == 0 ? f.name : f.name + ' (' + f.nameIdx + ')';
+      this.tableItems.push(f)
+    });
+    this.files.forEach(f => {
+      f.type = 'file';
+      this.tableItems.push(f)
+    });
   }
 
-  loadTooltips() {
-  //   const tooltipelements: NodeListOf<HTMLElement> =
-  //   document.querySelectorAll("[data-bs-toggle='tooltip']");
-  //   console.log(`loading tooltips tooltips count: ${tooltipelements.length}`)
-  // tooltipelements.forEach((el: HTMLElement) => {
-  //   new (window as any).bootstrap.Tooltip(el);
-  // });
-  }
 
   changeSelection(checked: boolean, type: string, id: string) {
     if (checked) {
@@ -61,10 +63,10 @@ export class FilesTableComponent implements OnInit {
     }
   }
 
-  selectSingleRow(event: Event, type: string, id: string) {
+  selectSingleRow(event: Event, item: Item) {
     event.stopPropagation();
     this.selectedTableItems = [];
-    this.selectedTableItems.push(new SelectedItem(type, id));
+    this.selectedTableItems.push(new SelectedItem(item.type!, item.id));
   }
 
   deleteFiles() {
@@ -98,23 +100,21 @@ export class FilesTableComponent implements OnInit {
     });
   }
 
-  changeStarredState(item: Item, type: string) {
-    const selectedItem = new SelectedItem(type, item.id);
-    console.log('clicked')
+  changeStarredState(item: Item) {
     if (item.isStarred) {
-      this.itemsService.unstarItem(selectedItem).subscribe({
+      this.itemsService.unstarItem(item.id).subscribe({
         next: () => item.isStarred = false
       });
     } else {
-      this.itemsService.starItem(selectedItem).subscribe({
+      this.itemsService.starItem(item.id).subscribe({
         next: () => item.isStarred = true
       });
     }
   }
 
-  createFileLink(file: UserFile) {
-    this.createLinkFile = file;
-    this.filesService.createFileLink(file.id).subscribe({
+  createFileLink(item: Item) {
+    this.createLinkFile = item;
+    this.filesService.createFileLink(item.id).subscribe({
       next: (response) => {
         this.createdLink = `https://${window.location.host}/api/files/shared/${response.linkId}`
         console.log(`createdLink: ${this.createdLink}`)

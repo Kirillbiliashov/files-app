@@ -22,12 +22,12 @@ export class ItemsHttpService {
         return this.client.post('api/items/download', body, httpOptions);
     }
 
-    starItem(item: SelectedItem) {
-        return this.client.patch('api/items/star', item);
+    starItem(id: string) {
+        return this.client.patch(`api/items/star/${id}`, {});
     }
 
-    unstarItem(item: SelectedItem) {
-        return this.client.patch('api/items/unstar', item);
+    unstarItem(id: string) {
+        return this.client.patch(`api/items/unstar/${id}`, {});
     }
 
 }

@@ -124,20 +124,20 @@ namespace FilesApp.Controllers.API
             .ToList();
         }
 
-        [HttpPatch("star")]
-        public async Task<IActionResult> StarItem([FromBody] SelectedItem body)
+        [HttpPatch("star/{id}")]
+        public async Task<IActionResult> StarItem(string id)
         {
-            Item item = new Item { Id = body.Id };
+            Item item = new Item { Id = id };
             _itemsRepository.Update(item, i => i.IsStarred, true);
             await _itemsRepository.SaveAsync();
 
             return NoContent();
         }
 
-        [HttpPatch("unstar")]
-        public async Task<IActionResult> UnstarItem([FromBody] SelectedItem body)
+        [HttpPatch("unstar/{id}")]
+        public async Task<IActionResult> UnstarItem(string id)
         {
-            var item = new Item { Id = body.Id };
+            var item = new Item { Id = id };
             _itemsRepository.Update(item, i => i.IsStarred, false);
             await _itemsRepository.SaveAsync();
 

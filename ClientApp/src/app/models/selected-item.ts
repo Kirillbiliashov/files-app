@@ -1,3 +1,5 @@
+import { Item } from "./item";
+
 export class SelectedItem {
     constructor(public type: string, public id: string) { }
 
