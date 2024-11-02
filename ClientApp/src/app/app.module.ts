@@ -7,8 +7,6 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
-import { CounterComponent } from './counter/counter.component';
-import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { FolderComponent } from './folder/folder.component';
 import { FilesTableComponent } from './files-table/files-table.component';
 import { FilesActionsComponent } from './files-actions/files-actions.component';
@@ -16,20 +14,22 @@ import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { GoogleAuthCallbackComponent } from './google-auth-callback/google-auth-callback.component';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import { SidebarFolderComponent } from './sidebar-folder/sidebar-folder.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    CounterComponent,
-    FetchDataComponent,
     FolderComponent,
     FilesTableComponent,
     FilesActionsComponent,
     RegisterComponent,
     LoginComponent,
-    GoogleAuthCallbackComponent
+    GoogleAuthCallbackComponent,
+    SidebarComponent,
+    SidebarFolderComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

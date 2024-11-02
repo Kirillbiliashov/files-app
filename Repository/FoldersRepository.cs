@@ -122,10 +122,23 @@ namespace FilesApp.Repository
             });
         }
 
+        public List<Folder> GetSubfolders(string userId, string folderId) => 
+        _context.Items
+        .AsNoTracking()
+        .OfType<Folder>()
+        .Where(f => f.UserId == userId && f.FolderId == folderId)
+        .ToList();
+
         public bool IsTrackedByName(string userId, string name) =>
         _context.ChangeTracker.Entries<Folder>()
                 .Where(f => f.Entity.UserId == userId && f.Entity.Name == name)
                 .Any();
+
+        public override List<Folder> GetAll(string userId) => _context.Items
+        .OfType<Folder>()
+        .Where(i => i.UserId == userId && i.FolderId == null)
+        .AsNoTracking()
+        .ToList();
 
     }
 }

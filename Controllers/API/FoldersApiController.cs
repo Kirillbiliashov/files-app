@@ -22,6 +22,15 @@ namespace FilesApp.Controllers
         private readonly IFoldersRepository _foldersRepository;
 
         public FoldersApiController(IFoldersRepository foldersRepository) => _foldersRepository = foldersRepository;
+
+
+        [HttpGet("")]
+        public async Task<IActionResult> GetAllFolders()
+        {
+            var folders = _foldersRepository.GetAll(UserId);
+            Console.WriteLine($"folders count: {folders.Count}");
+            return new JsonResult(folders);
+        }
         
 
         [HttpGet("{id}")]
@@ -45,6 +54,14 @@ namespace FilesApp.Controllers
                 }),
                 files
             });
+        }
+
+        [HttpGet("subfolders/{id}")]
+        public async Task<IActionResult> GetSubfolders(string id)
+        {
+            var subfolders = _foldersRepository.GetSubfolders(UserId, id);
+
+            return  Ok(subfolders);
         }
 
         [HttpPost("")]

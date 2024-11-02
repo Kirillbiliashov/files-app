@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FoldersHttpService } from '../services/folders-service';
 import { FolderData } from '../models/folder-data';
+import { UserFolder } from '../models/user-folder';
 
 @Component({
   selector: 'app-folder',
@@ -12,6 +13,7 @@ export class FolderComponent implements OnInit {
   folderName: string = "";
   folderId: string | undefined;
   fodlerData: FolderData | undefined;
+  folders: UserFolder[] = [];
 
   constructor(private route: ActivatedRoute, private foldersService: FoldersHttpService, private router: Router) { }
 
@@ -20,6 +22,13 @@ export class FolderComponent implements OnInit {
       this.folderId = params['id'];
       this.loadFolderData();
     });
+    this.foldersService.getAllFolders().subscribe({
+      next: (res) => {
+        res.forEach(f => f.name = f.nameIdx == 0 ? f.name : f.name + ' (' + f.nameIdx + ')');
+        this.folders = res
+      },
+      error: console.log
+    })
   }
 
   get enclosingFolderName(): string {

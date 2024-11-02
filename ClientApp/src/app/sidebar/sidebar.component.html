@@ -1,0 +1,34 @@
+<style>
+    .folder-row:hover {
+        background-color: #f0f0f0;
+        cursor: pointer;
+    }
+    .folder-row {
+        padding-left: 10px;
+        padding-bottom: 5px;
+        padding-top: 5px
+    }
+
+    .arrow-icon {
+        border-radius: 50px;
+        padding: 4px;
+        box-sizing: content-box;
+    }
+
+    .arrow-icon:hover {
+        background-color: rgb(200, 199, 199);
+    }
+</style>
+
+<div class="d-flex flex-column " style="border-right: 1px solid rgb(223, 221, 221); height: 100%;" >
+    <div class="d-flex align-items-center folder-row" style="cursor: pointer;"  (click)="foldersListDisplayed = !foldersListDisplayed">
+        <svg class="arrow-icon" *ngIf="!foldersListDisplayed" width="12px" height="12px" viewBox="-4.5 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>arrow_right [#333]</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Page-1" stroke-width="0.5" fill="none" fill-rule="evenodd"> <g id="Dribbble-Light-Preview" transform="translate(-425.000000, -6679.000000)" fill="#000000"> <g id="icons" transform="translate(56.000000, 160.000000)"> <path d="M370.39,6519 L369,6520.406 L377.261,6529.013 L376.38,6529.931 L376.385,6529.926 L369.045,6537.573 L370.414,6539 C372.443,6536.887 378.107,6530.986 380,6529.013 C378.594,6527.547 379.965,6528.976 370.39,6519" id="arrow_right-[#333]"> </path> </g> </g> </g> </g></svg>
+        <svg class="arrow-icon" *ngIf="foldersListDisplayed" fill="#000000" width="12px" height="12px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.8"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M0.256 8.606c0-0.269 0.106-0.544 0.313-0.75 0.412-0.412 1.087-0.412 1.5 0l14.119 14.119 13.913-13.912c0.413-0.412 1.087-0.412 1.5 0s0.413 1.088 0 1.5l-14.663 14.669c-0.413 0.413-1.088 0.413-1.5 0l-14.869-14.869c-0.213-0.213-0.313-0.481-0.313-0.756z"></path> </g></svg>
+        <span style="margin-left: 5px">Folders</span>
+    </div>
+    <div *ngIf="foldersListDisplayed">
+        <div *ngFor="let folder of sidebarFolders" class="d-flex flex-column" >
+            <app-sidebar-folder [folder]="folder"></app-sidebar-folder>
+        </div>
+    </div>
+</div>

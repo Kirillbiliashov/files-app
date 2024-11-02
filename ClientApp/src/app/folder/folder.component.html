@@ -3,11 +3,23 @@
       text-decoration: none;
     }
   </style>
-<app-files-actions (onFileUpload)="loadFolderData()"></app-files-actions>
   
-  <h5 style="margin-top: 50px" >All files</h5>
-  <h3 *ngIf="fodlerData?.folder">{{this.enclosingFolderName}}</h3>
-  <ng-container *ngIf="fodlerData">
-    <app-files-table [files]="fodlerData.files" [folders]="fodlerData.subfolders"></app-files-table>
-    
-    </ng-container>
+
+
+<div class="row" style="height: 100%" >
+  <div class="col-2" *ngIf="this.folders.length > 0">
+    <app-sidebar [folders]="this.folders"></app-sidebar>
+  </div>
+
+  <div class="col-10">
+    <app-files-actions (onFileUpload)="loadFolderData()"></app-files-actions>
+    <h5 style="margin-top: 50px" >All files</h5>
+    <h3 *ngIf="fodlerData?.folder">{{this.enclosingFolderName}}</h3>
+    <ng-container *ngIf="fodlerData">
+      <app-files-table [files]="fodlerData.files" [folders]="fodlerData.subfolders"></app-files-table>
+      
+      </ng-container>
+  </div>
+</div>
+
+

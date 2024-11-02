@@ -1,6 +1,19 @@
-<body>
+
+<style>
+  html, body {
+    height: 100%; /* Make sure body takes full viewport height */
+    width: 100vw  !important;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column; /* Arrange children vertically */
+  }
+</style>
+<body >
   <app-nav-menu></app-nav-menu>
-  <main class="container">
-    <router-outlet></router-outlet>
-  </main>
+  <div class="row flex-grow-1">
+    <main  >
+      <router-outlet></router-outlet>
+    </main>
+  </div>
 </body>

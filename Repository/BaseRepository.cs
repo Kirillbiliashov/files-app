@@ -70,7 +70,7 @@ namespace FilesApp.Repository
          .FirstOrDefault();
 
 
-        public List<T> GetAll(string userId) => 
+        public virtual List<T> GetAll(string userId) => 
         _context.Set<T>()
         .Where(i => i.UserId == userId)
         .AsNoTracking()

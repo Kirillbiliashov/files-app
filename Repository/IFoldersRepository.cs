@@ -8,6 +8,9 @@ namespace FilesApp.Repository
 {
     public interface IFoldersRepository: IRepository<Folder>
     {
+
+        List<Folder> GetSubfolders(string userId, string folderId);
+
         string? GetFolderName(string userId, string folderId);
 
         long GetSize(string userId, string id);
