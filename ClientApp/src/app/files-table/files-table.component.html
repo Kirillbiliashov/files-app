@@ -28,7 +28,8 @@
 
   .link-icon {
     cursor: pointer;
-    padding: 4px
+    padding: 4px;
+    box-sizing: content-box;
   }
 
   .link-icon:hover {
@@ -44,7 +45,7 @@
     background-color: white;
     border: 0.5px solid rgb(13, 13, 13);
     border-radius: 15px;
-    bottom: -80px; 
+    bottom: -80px;
     right: 0
   }
 
@@ -52,18 +53,17 @@
     transform: scale(1.2);
   }
 
-  input[type="checkbox"]:focus{
-        outline: none !important;
-        -webkit-appearance: none;
-        box-shadow: none !important;
-    }
-
-  .checkbox-table-row {
-    width: 35px;
-     border: none !important
+  input[type="checkbox"]:focus {
+    outline: none !important;
+    -webkit-appearance: none;
+    box-shadow: none !important;
   }
 
+  .checkbox-table-row {
+    border: none !important;
+  }
 </style>
+
 <div class="d-flex" style="gap: 10px" *ngIf="selectedTableItems.length > 0">
   <button type="button" style="border-color: black;" class="btn btn-outline-dark download-btn"
     (click)="downloadFiles()"><span>
@@ -96,8 +96,8 @@
 </div>
 <div class="d-flex" style="gap: 10px;" *ngIf="selectedTableItems.length == 0">
   <button style="border-color: black;" type="button" class="btn btn-outline-dark delete-btn"
-    [ngClass]="{'starred-btn-clicked': showStarredOnly, 'starred-btn': !showStarredOnly}" data-bs-toggle='tooltip' data-bs-placement="top" title="Remove from starred" 
-    (click)="showStarredOnly = !showStarredOnly"><span>
+    [ngClass]="{'starred-btn-clicked': showStarredOnly, 'starred-btn': !showStarredOnly}" data-bs-toggle='tooltip'
+    data-bs-placement="top" title="Remove from starred" (click)="showStarredOnly = !showStarredOnly"><span>
       <svg style="margin-bottom: 3px" width="16px" height="16px" viewBox="0 0 24 24" fill="white"
         xmlns="http://www.w3.org/2000/svg">
         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -115,78 +115,107 @@
 <table class="table" >
   <thead>
     <tr (mouseenter)="headerHovered = true" (mouseleave)="headerHovered = false">
-      <th scope="col checkbox-table-row" style="border: none !important">
-        <input #headerCheckbox class="form-check-input" type="checkbox" [checked]="selectedTableItems.length > 0"
-        (change)="changeAllFilesSelection(headerCheckbox.checked)" id="flexCheckIndeterminate" *ngIf="headerHovered || selectedTableItems.length > 0">
+      <th scope="col checkbox-table-row" style="border: none !important; width: 35px; height: 40px">
+        <div class="d-flex align-items-center justify-content-end">
+          <input #headerCheckbox class="form-check-input" type="checkbox" [checked]="selectedTableItems.length > 0"
+          (change)="changeAllFilesSelection(headerCheckbox.checked)" id="flexCheckIndeterminate"
+          *ngIf="headerHovered || selectedTableItems.length > 0">
+        </div>
       </th>
-      <th scope="col" style="width: 65%;">
+      <th scope="col" >
         <span>Name</span>
       </th>
-      <th scope="col" style="width: 10%;">Length</th>
-      <th scope="col"  style="max-width: calc(25% - 30px);">Modified</th>
+      <th scope="col" >Length</th>
+      <th scope="col" >Modified</th>
     </tr>
   </thead>
   <tbody>
     <ng-container *ngFor="let item of tableItems">
       <tr *ngIf="!showStarredOnly || (showStarredOnly && item.isStarred)"
-      (mouseenter)="lastHoverIdx = tableItems.indexOf(item)" 
-      (mouseleave)="lastHoverIdx = -1"
-      [style.background-color]="rowSelected(item.id) || lastHoverIdx == tableItems.indexOf(item) ? '#f0f0f0' : 'transparent'"
-      (click)="selectSingleRow($event, item)"
-      >
+        (mouseenter)="lastHoverIdx = tableItems.indexOf(item)" (mouseleave)="lastHoverIdx = -1"
+        [style.background-color]="rowSelected(item.id) || lastHoverIdx == tableItems.indexOf(item) ? '#f0f0f0' : 'transparent'"
+        (click)="selectSingleRow($event, item)">
         <td class="checkbox-table-row">
-          <input #checkbox class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
-          (click)="$event.stopPropagation()" (change)="changeSelection(checkbox.checked, 'file', item.id)"
-          style="margin-top: 8px !important"
-          [checked]="rowSelected(item.id)"
-          />
+          <div class="d-flex align-items-center justify-content-end">
+            <input #checkbox class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
+            (click)="$event.stopPropagation()" (change)="changeSelection(checkbox.checked, 'file', item.id)"
+             [checked]="rowSelected(item.id)" />
+          </div>
         </td>
-        <td class="d-flex" style="width: 100%;" >
-        <svg style="margin-right: 5px" *ngIf="item.type == 'folder'" width="20px" height="20px" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M0 1H6L9 4H16V14H0V1Z" fill="#00c7fc"></path> </g></svg>
-          <a [href]="item.type == 'folder' ? ('/folders/' + item.id) : ('/api/files/open/' + item.id)" [attr.target]="item.type == 'file' ? '_blank' : '_self'">
-            {{ item.name }}
-          </a>
-          <svg *ngIf="!item.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer"
-            (click)="$event.stopPropagation(); changeStarredState(item)" width="22px" height="22px"
-            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-bs-toggle="tooltip" data-bs-placement="top" title="Add to starred" >
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-            <g id="SVGRepo_iconCarrier">
-              <path
-                d="M11.2691 4.41115C11.5006 3.89177 11.6164 3.63208 11.7776 3.55211C11.9176 3.48263 12.082 3.48263 12.222 3.55211C12.3832 3.63208 12.499 3.89177 12.7305 4.41115L14.5745 8.54808C14.643 8.70162 14.6772 8.77839 14.7302 8.83718C14.777 8.8892 14.8343 8.93081 14.8982 8.95929C14.9705 8.99149 15.0541 9.00031 15.2213 9.01795L19.7256 9.49336C20.2911 9.55304 20.5738 9.58288 20.6997 9.71147C20.809 9.82316 20.8598 9.97956 20.837 10.1342C20.8108 10.3122 20.5996 10.5025 20.1772 10.8832L16.8125 13.9154C16.6877 14.0279 16.6252 14.0842 16.5857 14.1527C16.5507 14.2134 16.5288 14.2807 16.5215 14.3503C16.5132 14.429 16.5306 14.5112 16.5655 14.6757L17.5053 19.1064C17.6233 19.6627 17.6823 19.9408 17.5989 20.1002C17.5264 20.2388 17.3934 20.3354 17.2393 20.3615C17.0619 20.3915 16.8156 20.2495 16.323 19.9654L12.3995 17.7024C12.2539 17.6184 12.1811 17.5765 12.1037 17.56C12.0352 17.5455 11.9644 17.5455 11.8959 17.56C11.8185 17.5765 11.7457 17.6184 11.6001 17.7024L7.67662 19.9654C7.18404 20.2495 6.93775 20.3915 6.76034 20.3615C6.60623 20.3354 6.47319 20.2388 6.40075 20.1002C6.31736 19.9408 6.37635 19.6627 6.49434 19.1064L7.4341 14.6757C7.46898 14.5112 7.48642 14.429 7.47814 14.3503C7.47081 14.2807 7.44894 14.2134 7.41394 14.1527C7.37439 14.0842 7.31195 14.0279 7.18708 13.9154L3.82246 10.8832C3.40005 10.5025 3.18884 10.3122 3.16258 10.1342C3.13978 9.97956 3.19059 9.82316 3.29993 9.71147C3.42581 9.58288 3.70856 9.55304 4.27406 9.49336L8.77835 9.01795C8.94553 9.00031 9.02911 8.99149 9.10139 8.95929C9.16534 8.93081 9.2226 8.8892 9.26946 8.83718C9.32241 8.77839 9.35663 8.70162 9.42508 8.54808L11.2691 4.41115Z"
-                stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-            </g>
-          </svg>
-          <svg *ngIf="item.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer" data-bs-toggle='tooltip' data-bs-placement="top" title="Remove from starred" 
-            (click)="$event.stopPropagation(); changeStarredState(item)" width="22px" height="22px"
-            viewBox="0 0 24 24" fill="yellow" xmlns="http://www.w3.org/2000/svg">
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-            <g id="SVGRepo_iconCarrier">
-              <path
-                d="M11.2691 4.41115C11.5006 3.89177 11.6164 3.63208 11.7776 3.55211C11.9176 3.48263 12.082 3.48263 12.222 3.55211C12.3832 3.63208 12.499 3.89177 12.7305 4.41115L14.5745 8.54808C14.643 8.70162 14.6772 8.77839 14.7302 8.83718C14.777 8.8892 14.8343 8.93081 14.8982 8.95929C14.9705 8.99149 15.0541 9.00031 15.2213 9.01795L19.7256 9.49336C20.2911 9.55304 20.5738 9.58288 20.6997 9.71147C20.809 9.82316 20.8598 9.97956 20.837 10.1342C20.8108 10.3122 20.5996 10.5025 20.1772 10.8832L16.8125 13.9154C16.6877 14.0279 16.6252 14.0842 16.5857 14.1527C16.5507 14.2134 16.5288 14.2807 16.5215 14.3503C16.5132 14.429 16.5306 14.5112 16.5655 14.6757L17.5053 19.1064C17.6233 19.6627 17.6823 19.9408 17.5989 20.1002C17.5264 20.2388 17.3934 20.3354 17.2393 20.3615C17.0619 20.3915 16.8156 20.2495 16.323 19.9654L12.3995 17.7024C12.2539 17.6184 12.1811 17.5765 12.1037 17.56C12.0352 17.5455 11.9644 17.5455 11.8959 17.56C11.8185 17.5765 11.7457 17.6184 11.6001 17.7024L7.67662 19.9654C7.18404 20.2495 6.93775 20.3915 6.76034 20.3615C6.60623 20.3354 6.47319 20.2388 6.40075 20.1002C6.31736 19.9408 6.37635 19.6627 6.49434 19.1064L7.4341 14.6757C7.46898 14.5112 7.48642 14.429 7.47814 14.3503C7.47081 14.2807 7.44894 14.2134 7.41394 14.1527C7.37439 14.0842 7.31195 14.0279 7.18708 13.9154L3.82246 10.8832C3.40005 10.5025 3.18884 10.3122 3.16258 10.1342C3.13978 9.97956 3.19059 9.82316 3.29993 9.71147C3.42581 9.58288 3.70856 9.55304 4.27406 9.49336L8.77835 9.01795C8.94553 9.00031 9.02911 8.99149 9.10139 8.95929C9.16534 8.93081 9.2226 8.8892 9.26946 8.83718C9.32241 8.77839 9.35663 8.70162 9.42508 8.54808L11.2691 4.41115Z"
-                stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-            </g>
-          </svg>
+        <td style="width: 60%">
+          <div class="d-flex" >
+            <svg style="margin-right: 5px" *ngIf="item.type == 'folder'" width="20px" height="20px" viewBox="0 0 16 16"
+              fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                <path d="M0 1H6L9 4H16V14H0V1Z" fill="#00c7fc"></path>
+              </g>
+            </svg>
+            <a [href]="item.type == 'folder' ? ('/folders/' + item.id) : ('/api/files/open/' + item.id)"
+              [attr.target]="item.type == 'file' ? '_blank' : '_self'">
+              {{ item.name }}
+            </a>
+            <svg *ngIf="!item.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer"
+              (click)="$event.stopPropagation(); changeStarredState(item)" width="22px" height="22px"
+              viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-bs-toggle="tooltip"
+              data-bs-placement="top" title="Add to starred">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                <path
+                  d="M11.2691 4.41115C11.5006 3.89177 11.6164 3.63208 11.7776 3.55211C11.9176 3.48263 12.082 3.48263 12.222 3.55211C12.3832 3.63208 12.499 3.89177 12.7305 4.41115L14.5745 8.54808C14.643 8.70162 14.6772 8.77839 14.7302 8.83718C14.777 8.8892 14.8343 8.93081 14.8982 8.95929C14.9705 8.99149 15.0541 9.00031 15.2213 9.01795L19.7256 9.49336C20.2911 9.55304 20.5738 9.58288 20.6997 9.71147C20.809 9.82316 20.8598 9.97956 20.837 10.1342C20.8108 10.3122 20.5996 10.5025 20.1772 10.8832L16.8125 13.9154C16.6877 14.0279 16.6252 14.0842 16.5857 14.1527C16.5507 14.2134 16.5288 14.2807 16.5215 14.3503C16.5132 14.429 16.5306 14.5112 16.5655 14.6757L17.5053 19.1064C17.6233 19.6627 17.6823 19.9408 17.5989 20.1002C17.5264 20.2388 17.3934 20.3354 17.2393 20.3615C17.0619 20.3915 16.8156 20.2495 16.323 19.9654L12.3995 17.7024C12.2539 17.6184 12.1811 17.5765 12.1037 17.56C12.0352 17.5455 11.9644 17.5455 11.8959 17.56C11.8185 17.5765 11.7457 17.6184 11.6001 17.7024L7.67662 19.9654C7.18404 20.2495 6.93775 20.3915 6.76034 20.3615C6.60623 20.3354 6.47319 20.2388 6.40075 20.1002C6.31736 19.9408 6.37635 19.6627 6.49434 19.1064L7.4341 14.6757C7.46898 14.5112 7.48642 14.429 7.47814 14.3503C7.47081 14.2807 7.44894 14.2134 7.41394 14.1527C7.37439 14.0842 7.31195 14.0279 7.18708 13.9154L3.82246 10.8832C3.40005 10.5025 3.18884 10.3122 3.16258 10.1342C3.13978 9.97956 3.19059 9.82316 3.29993 9.71147C3.42581 9.58288 3.70856 9.55304 4.27406 9.49336L8.77835 9.01795C8.94553 9.00031 9.02911 8.99149 9.10139 8.95929C9.16534 8.93081 9.2226 8.8892 9.26946 8.83718C9.32241 8.77839 9.35663 8.70162 9.42508 8.54808L11.2691 4.41115Z"
+                  stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              </g>
+            </svg>
+            <svg *ngIf="item.isStarred" style="margin-left: auto; margin-right: 0; cursor:pointer"
+              data-bs-toggle='tooltip' data-bs-placement="top" title="Remove from starred"
+              (click)="$event.stopPropagation(); changeStarredState(item)" width="22px" height="22px"
+              viewBox="0 0 24 24" fill="yellow" xmlns="http://www.w3.org/2000/svg">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier">
+                <path
+                  d="M11.2691 4.41115C11.5006 3.89177 11.6164 3.63208 11.7776 3.55211C11.9176 3.48263 12.082 3.48263 12.222 3.55211C12.3832 3.63208 12.499 3.89177 12.7305 4.41115L14.5745 8.54808C14.643 8.70162 14.6772 8.77839 14.7302 8.83718C14.777 8.8892 14.8343 8.93081 14.8982 8.95929C14.9705 8.99149 15.0541 9.00031 15.2213 9.01795L19.7256 9.49336C20.2911 9.55304 20.5738 9.58288 20.6997 9.71147C20.809 9.82316 20.8598 9.97956 20.837 10.1342C20.8108 10.3122 20.5996 10.5025 20.1772 10.8832L16.8125 13.9154C16.6877 14.0279 16.6252 14.0842 16.5857 14.1527C16.5507 14.2134 16.5288 14.2807 16.5215 14.3503C16.5132 14.429 16.5306 14.5112 16.5655 14.6757L17.5053 19.1064C17.6233 19.6627 17.6823 19.9408 17.5989 20.1002C17.5264 20.2388 17.3934 20.3354 17.2393 20.3615C17.0619 20.3915 16.8156 20.2495 16.323 19.9654L12.3995 17.7024C12.2539 17.6184 12.1811 17.5765 12.1037 17.56C12.0352 17.5455 11.9644 17.5455 11.8959 17.56C11.8185 17.5765 11.7457 17.6184 11.6001 17.7024L7.67662 19.9654C7.18404 20.2495 6.93775 20.3915 6.76034 20.3615C6.60623 20.3354 6.47319 20.2388 6.40075 20.1002C6.31736 19.9408 6.37635 19.6627 6.49434 19.1064L7.4341 14.6757C7.46898 14.5112 7.48642 14.429 7.47814 14.3503C7.47081 14.2807 7.44894 14.2134 7.41394 14.1527C7.37439 14.0842 7.31195 14.0279 7.18708 13.9154L3.82246 10.8832C3.40005 10.5025 3.18884 10.3122 3.16258 10.1342C3.13978 9.97956 3.19059 9.82316 3.29993 9.71147C3.42581 9.58288 3.70856 9.55304 4.27406 9.49336L8.77835 9.01795C8.94553 9.00031 9.02911 8.99149 9.10139 8.95929C9.16534 8.93081 9.2226 8.8892 9.26946 8.83718C9.32241 8.77839 9.35663 8.70162 9.42508 8.54808L11.2691 4.41115Z"
+                  stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              </g>
+            </svg>
+          </div>
         </td>
-        <td style="max-width: 10%;">
-          <span style="margin: 0; padding: 0; margin-top: 10px !important">{{ item.size }}</span>
+        <td>
+            <span >{{ item.size }}</span>
         </td>
-        <td class="d-flex align-items-end" style="max-width: calc(100% - 30px); position: relative; ">
-          <span >
-            {{ item.lastModified | date:'medium' }}
-          </span>
-          <div *ngIf="item.type == 'file'" style="position: relative;  margin-left: 8px; height: 28px; width: 28px" class="link-icon">
-              <svg  (click)="createFileLink(item)" style=" margin: 0; margin-bottom: 8px" *ngIf="lastHoverIdx == tableItems.indexOf(item)"   width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.4800000000000001"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.7285 3.88396C17.1629 2.44407 19.2609 2.41383 20.4224 3.57981C21.586 4.74798 21.5547 6.85922 20.1194 8.30009L17.6956 10.7333C17.4033 11.0268 17.4042 11.5017 17.6976 11.794C17.9911 12.0863 18.466 12.0854 18.7583 11.7919L21.1821 9.35869C23.0934 7.43998 23.3334 4.37665 21.4851 2.5212C19.6346 0.663551 16.5781 0.905664 14.6658 2.82536L9.81817 7.69182C7.90688 9.61053 7.66692 12.6739 9.51519 14.5293C9.80751 14.8228 10.2824 14.8237 10.5758 14.5314C10.8693 14.2391 10.8702 13.7642 10.5779 13.4707C9.41425 12.3026 9.44559 10.1913 10.8809 8.75042L15.7285 3.88396Z" fill="#000000"></path> <path d="M14.4851 9.47074C14.1928 9.17728 13.7179 9.17636 13.4244 9.46868C13.131 9.76101 13.1301 10.2359 13.4224 10.5293C14.586 11.6975 14.5547 13.8087 13.1194 15.2496L8.27178 20.1161C6.83745 21.556 4.73937 21.5863 3.57791 20.4203C2.41424 19.2521 2.44559 17.1408 3.88089 15.6999L6.30473 13.2667C6.59706 12.9732 6.59614 12.4984 6.30268 12.206C6.00922 11.9137 5.53434 11.9146 5.24202 12.2081L2.81818 14.6413C0.906876 16.5601 0.666916 19.6234 2.51519 21.4789C4.36567 23.3365 7.42221 23.0944 9.33449 21.1747L14.1821 16.3082C16.0934 14.3895 16.3334 11.3262 14.4851 9.47074Z" fill="#000000"></path> </g></svg>
-       
-            <div *ngIf="item == createLinkFile" class="create-link-container">
-              <p *ngIf="!this.createdLink" style="margin: 0; padding: 0">Getting the link...</p>
-              <div *ngIf="this.createdLink" class="d-flex flex-column">
-                <div class="d-flex justify-content-between">
-                  <p style="margin: 0; padding: 0;">Copy link</p>
-                  <span aria-hidden="true" style="transform: scale(1.4);" (click)="this.createdLink = null; this.createLinkFile = null">&times;</span>
+        <td style="position: relative; ">
+          <div class="d-flex  align-items-center" >
+            <span>
+              {{ item.lastModified | date:'medium' }}
+            </span>
+            <div *ngIf="item.type == 'file'" class="link-icon" style="width: 16px; height: 16px; margin-left: 8px">
+              <svg   (click)="createFileLink(item)" 
+                *ngIf="lastHoverIdx == tableItems.indexOf(item) && item.type == 'file'" width="16px" height="16px" viewBox="0 0 24 24"
+                fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.4800000000000001">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <path
+                    d="M15.7285 3.88396C17.1629 2.44407 19.2609 2.41383 20.4224 3.57981C21.586 4.74798 21.5547 6.85922 20.1194 8.30009L17.6956 10.7333C17.4033 11.0268 17.4042 11.5017 17.6976 11.794C17.9911 12.0863 18.466 12.0854 18.7583 11.7919L21.1821 9.35869C23.0934 7.43998 23.3334 4.37665 21.4851 2.5212C19.6346 0.663551 16.5781 0.905664 14.6658 2.82536L9.81817 7.69182C7.90688 9.61053 7.66692 12.6739 9.51519 14.5293C9.80751 14.8228 10.2824 14.8237 10.5758 14.5314C10.8693 14.2391 10.8702 13.7642 10.5779 13.4707C9.41425 12.3026 9.44559 10.1913 10.8809 8.75042L15.7285 3.88396Z"
+                    fill="#000000"></path>
+                  <path
+                    d="M14.4851 9.47074C14.1928 9.17728 13.7179 9.17636 13.4244 9.46868C13.131 9.76101 13.1301 10.2359 13.4224 10.5293C14.586 11.6975 14.5547 13.8087 13.1194 15.2496L8.27178 20.1161C6.83745 21.556 4.73937 21.5863 3.57791 20.4203C2.41424 19.2521 2.44559 17.1408 3.88089 15.6999L6.30473 13.2667C6.59706 12.9732 6.59614 12.4984 6.30268 12.206C6.00922 11.9137 5.53434 11.9146 5.24202 12.2081L2.81818 14.6413C0.906876 16.5601 0.666916 19.6234 2.51519 21.4789C4.36567 23.3365 7.42221 23.0944 9.33449 21.1747L14.1821 16.3082C16.0934 14.3895 16.3334 11.3262 14.4851 9.47074Z"
+                    fill="#000000"></path>
+                </g>
+              </svg>
+
+              <div *ngIf="item == createLinkFile" class="create-link-container">
+                <p *ngIf="!this.createdLink" style="margin: 0; padding: 0">Getting the link...</p>
+                <div *ngIf="this.createdLink" class="d-flex flex-column">
+                  <div class="d-flex justify-content-between">
+                    <p style="margin: 0; padding: 0;">Copy link</p>
+                    <span aria-hidden="true" style="transform: scale(1.4);"
+                      (click)="this.createdLink = null; this.createLinkFile = null">&times;</span>
+                  </div>
+                  <input style="margin-top: 5px" type="text" id="link" name="link" [value]="this.createdLink" readonly>
                 </div>
-                <input style="margin-top: 5px" type="text" id="link" name="link" [value]="this.createdLink" readonly>
               </div>
             </div>
           </div>
@@ -196,6 +225,8 @@
     </ng-container>
   </tbody>
 </table>
+
+
 
 
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -225,4 +256,4 @@
   var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
   })
-  </script>
+</script>
