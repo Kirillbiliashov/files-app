@@ -12,14 +12,25 @@
     font-size: 0.9rem;
   }
 
+  .dashed-border {
+    border: 2px dashed black;
+    border-radius: 10px;
+  }
+
+  .transparent-border {
+    border: 2px solid transparent;
+  }
+
 
 </style>
   <div class="row" *ngIf="data" style="height: 100%" >
     <div class="col-2">
       <app-sidebar [folders]="this.data.folders"></app-sidebar>
     </div>
-    <div class="col-10">
-      <app-files-actions (onFileUpload)="loadFiles()" (onInfoChange)="onNewInfo($event)"></app-files-actions>
+    <div class="col-10 p-2" (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)" [ngClass]="{'dashed-border': this.showDragBorder, 'transparent-border': !this.showDragBorder}">
+      <app-files-actions [droppedFiles]="this.droppedFiles" (onFileUpload)="loadFiles()" (onInfoChange)="onNewInfo($event)"></app-files-actions>
 
       <h3 style="margin-top: 50px">All files</h3>
       <ng-container *ngIf="data">

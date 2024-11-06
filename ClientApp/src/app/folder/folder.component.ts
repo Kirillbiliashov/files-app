@@ -14,6 +14,9 @@ export class FolderComponent implements OnInit {
   folderId: string | undefined;
   fodlerData: FolderData | undefined;
   folders: UserFolder[] = [];
+  showDragBorder = false;
+  droppedFiles: FileList | null = null;
+  infoMessage = '';
 
   constructor(private route: ActivatedRoute, private foldersService: FoldersHttpService, private router: Router) { }
 
@@ -48,6 +51,34 @@ export class FolderComponent implements OnInit {
         this.router.navigate(['/folders', res.folderId]);
       }
     })
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.showDragBorder) {
+      this.showDragBorder = true;
+    }
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.showDragBorder = false;
+  }
+
+  onDrop(event: DragEvent) {
+    console.log(`dropped`);
+    event.preventDefault();
+    event.stopPropagation();
+    this.showDragBorder = false;
+    if (event.dataTransfer?.files) {
+      this.droppedFiles = event.dataTransfer.files;
+    }
+  }
+
+  onNewInfo(message: string) {
+    this.infoMessage = message
   }
 
 }

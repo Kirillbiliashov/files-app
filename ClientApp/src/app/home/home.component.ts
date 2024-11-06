@@ -13,6 +13,8 @@ export class HomeComponent implements OnInit {
   folderName: string = "";
   public data: FileData | null = null;
   infoMessage = '';
+  showDragBorder = false;
+  droppedFiles: FileList | null = null;
 
   constructor(private filesService: FilesHttpService, private router: Router) { }
 
@@ -26,6 +28,29 @@ export class HomeComponent implements OnInit {
 
   onNewInfo(message: string) {
     this.infoMessage = message
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!this.showDragBorder) {
+      this.showDragBorder = true;
+    }
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.showDragBorder = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.showDragBorder = false;
+    if (event.dataTransfer?.files) {
+      this.droppedFiles = event.dataTransfer.files;
+    }
   }
 
 }
