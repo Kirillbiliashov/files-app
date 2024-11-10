@@ -28,7 +28,6 @@ namespace FilesApp.Controllers
         public async Task<IActionResult> GetAllFolders()
         {
             var folders = _foldersRepository.GetAll(UserId);
-            Console.WriteLine($"folders count: {folders.Count}");
             return new JsonResult(folders);
         }
         

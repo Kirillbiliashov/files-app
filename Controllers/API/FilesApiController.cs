@@ -59,22 +59,19 @@ namespace FilesApp.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFiles(List<IFormFile> files, [FromForm] Dictionary<string, string> lastModified, [FromForm] string? folder)
+        public async Task<IActionResult> UploadFiles(List<IFormFile> files, [FromForm] Dictionary<string, string> lastModified, [FromForm] string? folderId)
         {
             if (files == null || files.Count == 0)
             {
                 return BadRequest();
             }
 
-            var folderName = folder != null ? _foldersRepository.GetFolderName(UserId, folder) : null;
             var filesToAdd = new List<UserFile>();
             for (int i = 0; i < files.Count; i++)
             {
                 var lastModifiedKey = $"lastModified_{i}";
-
-                var filename = folderName != null ? $"{folderName}/{files[i].FileName}" : files[i].FileName;
-                string? folderId = SaveFolders(filename);
-                filename = files[i].FileName.Split("/").Last();
+                var filename = files[i].FileName;
+                string? fileFolderId = SaveFolders(folderId, files[i].FileName.Split("/").SkipLast(1));
 
                 using (var memoryStream = files[i].OpenReadStream())
                 {
@@ -89,7 +86,7 @@ namespace FilesApp.Controllers
                         LastModified = long.Parse(lastModified[lastModifiedKey]),
                         Content = buffer,
                         Hash = hash,
-                        FolderId = folderId
+                        FolderId = fileFolderId
                     });
                 }
             }
@@ -126,40 +123,42 @@ namespace FilesApp.Controllers
                 return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
             }
         }
+//com.apple.Photos.NSItemProvider/uuid=62C755BB-8E4D-4695-BBA9-0C80C6C09158&library=1&type=1&mode=1&loc=true&cap=true.jpeg/photo-1570295999919-56ceb5ecca61.jpeg
+//com.apple.Photos.NSItemProvider/uuid=17E5EED1-5323-44AB-A680-93E528F01DE1&library=1&type=1&mode=1&loc=true&cap=true.jpeg/tree-736885_1280.jpeg
 
-        private string? SaveFolders(string path)
+        private string? SaveFolders(string? folderId, IEnumerable<string>folders)
         {
-            if (string.IsNullOrWhiteSpace(path) || !path.Contains("/"))
+            if (folders.Count() == 0)
             {
-                return null;
+                return folderId;
             }
 
-            string? folderId = null;
-            var parts = path.Split("/");
-            var folderPaths = parts.SkipLast(1).ToList();
+            // string? folderId = null;
 
-            folderPaths.ForEach(folderName =>
+            var currentFolderId = folderId;
+
+            folders.ToList().ForEach(folderName =>
             {
-                var isFolderAdded = _foldersRepository.IsTrackedByName(UserId, folderName);
-
-                if (!(isFolderAdded || _foldersRepository.ExistsByName(UserId, folderName)))
+                var isFolderAdded = _foldersRepository.IsTrackedByName(UserId, folderName, currentFolderId);
+                if (!(isFolderAdded || _foldersRepository.ExistsByName(UserId, currentFolderId, folderName)))
                 {
                     var folder = new Folder
                     {
                         UserId = UserId,
                         Name = folderName,
-                        FolderId = folderId
+                        FolderId = currentFolderId
                     };
                     _itemsRepository.Add(folder);
-                    folderId = folder.Id;
+                    currentFolderId = folder.Id;
                 }
                 else
                 {
-                    folderId = _foldersRepository.GetFolderIdByName(UserId, folderName, isFolderAdded);
+                    currentFolderId = _foldersRepository.GetFolderIdByName(UserId, currentFolderId, folderName, isFolderAdded);
                 }
             });
 
-            return folderId;
+
+            return currentFolderId;
         }
 
         [HttpGet("open/{id}")]

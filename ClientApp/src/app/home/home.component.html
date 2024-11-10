@@ -23,9 +23,9 @@
 
 
 </style>
-  <div class="row" *ngIf="data" style="height: 100%" >
+  <div class="row"  style="height: 100%" >
     <div class="col-2">
-      <app-sidebar [folders]="this.data.folders"></app-sidebar>
+      <app-sidebar [folders]="this.folders"></app-sidebar>
     </div>
     <div class="col-10 p-2" (dragover)="onDragOver($event)"
     (dragleave)="onDragLeave($event)"
@@ -33,8 +33,8 @@
       <app-files-actions [droppedFiles]="this.droppedFiles" (onFileUpload)="loadFiles()" (onInfoChange)="onNewInfo($event)"></app-files-actions>
 
       <h3 style="margin-top: 50px">All files</h3>
-      <ng-container *ngIf="data">
-            <app-files-table [files]="data.files" [folders]="data.folders" (onFilesChange)="loadFiles()" (onInfoChange)="onNewInfo($event)"></app-files-table>
+      <ng-container *ngIf="this.tableItems.length">
+            <app-files-table [tableItems]="this.tableItems" (onFilesChange)="loadFiles()" (onInfoChange)="onNewInfo($event)"></app-files-table>
       </ng-container>
       <div *ngIf="infoMessage" class="alert alert-primary" role="alert">
         {{infoMessage}}

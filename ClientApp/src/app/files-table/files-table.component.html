@@ -138,7 +138,7 @@
         <td class="checkbox-table-row">
           <div class="d-flex align-items-center justify-content-end">
             <input #checkbox class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
-            (click)="$event.stopPropagation()" (change)="changeSelection(checkbox.checked, 'file', item.id)"
+            (click)="$event.stopPropagation()" (change)="changeSelection(checkbox.checked, item.type!, item.id)"
              [checked]="rowSelected(item.id)" />
           </div>
         </td>

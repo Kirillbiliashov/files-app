@@ -39,7 +39,7 @@
     <h5 style="margin-top: 50px" >All files</h5>
     <h3 *ngIf="fodlerData?.folder">{{this.enclosingFolderName}}</h3>
     <ng-container *ngIf="fodlerData">
-      <app-files-table [files]="fodlerData.files" [folders]="fodlerData.subfolders" (onInfoChange)="onNewInfo($event)"></app-files-table>
+      <app-files-table [tableItems]="this.tableItems" (onFilesChange)="loadFolderData()" (onInfoChange)="onNewInfo($event)"></app-files-table>
       
       </ng-container>
       <div *ngIf="infoMessage" class="alert alert-primary" role="alert">

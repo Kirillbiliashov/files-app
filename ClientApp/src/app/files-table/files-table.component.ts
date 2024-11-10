@@ -1,10 +1,11 @@
-import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, Input, EventEmitter, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { UserFolder } from '../models/user-folder';
 import { UserFile } from '../models/user-file';
 import { FilesHttpService } from '../services/files-service';
 import { SelectedItem } from '../models/selected-item';
 import { ItemsHttpService } from '../services/items-service';
 import { Item } from '../models/item';
+import { FileData } from '../models/file-data';
 
 @Component({
   selector: 'app-files-table',
@@ -12,8 +13,7 @@ import { Item } from '../models/item';
   styleUrls: ['./files-table.component.css']
 })
 export class FilesTableComponent implements OnInit {
-  @Input() folders: UserFolder[] = [];
-  @Input() files: UserFile[] = [];
+  @Input() tableItems: Item[] = [];
   @Output() onFilesChange = new EventEmitter();
   @Output() onInfoChange = new EventEmitter();
 
@@ -25,21 +25,9 @@ export class FilesTableComponent implements OnInit {
   createLinkFile: Item | null = null;
   createdLink: string | null = null;
 
-  tableItems: Item[] = [];
-
   constructor(private filesService: FilesHttpService, private itemsService: ItemsHttpService) { }
 
-  ngOnInit(): void {
-    this.folders.forEach(f => {
-      f.type = 'folder';
-      f.name = f.nameIdx == 0 ? f.name : f.name + ' (' + f.nameIdx + ')';
-      this.tableItems.push(f)
-    });
-    this.files.forEach(f => {
-      f.type = 'file';
-      this.tableItems.push(f)
-    });
-  }
+  ngOnInit(): void {}
 
 
   changeSelection(checked: boolean, type: string, id: string) {
@@ -58,8 +46,7 @@ export class FilesTableComponent implements OnInit {
   changeAllFilesSelection(checked: boolean) {
     this.selectedTableItems = [];
     if (checked) {
-      this.folders.forEach(f => this.selectedTableItems.push(new SelectedItem("folder", f.id)));
-      this.files.forEach(f => this.selectedTableItems.push(new SelectedItem("file", f.id)));
+      this.tableItems.forEach(f => this.selectedTableItems.push(new SelectedItem(f.type!, f.id)));
     }
   }
 

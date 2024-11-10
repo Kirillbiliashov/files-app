@@ -47,10 +47,10 @@ namespace FilesApp.Repository
         {
         }
 
-        public bool ExistsByName(string userId, string name) =>
+        public bool ExistsByName(string userId, string folderId, string name) =>
          _context.Items
          .OfType<Folder>()
-         .Any(i => i.UserId == userId && i.Name == name);
+         .Any(i => i.UserId == userId && i.FolderId == folderId && i.Name == name);
 
         override public Folder? Get(string userId, string id) =>
         _context.Items
@@ -68,7 +68,7 @@ namespace FilesApp.Repository
         .OrderByDescending(i => i.NameIdx)
         .FirstOrDefault();
 
-        public string? GetFolderIdByName(string userId, string name, bool isFolderAdded)
+        public string? GetFolderIdByName(string userId, string parentId, string name, bool isFolderAdded)
         {
             var folders = isFolderAdded ?
             _context.ChangeTracker.Entries<Folder>().Select(e => e.Entity) :
@@ -129,9 +129,9 @@ namespace FilesApp.Repository
         .Where(f => f.UserId == userId && f.FolderId == folderId)
         .ToList();
 
-        public bool IsTrackedByName(string userId, string name) =>
+        public bool IsTrackedByName(string userId, string name, string folderId) =>
         _context.ChangeTracker.Entries<Folder>()
-                .Where(f => f.Entity.UserId == userId && f.Entity.Name == name)
+                .Where(f => f.Entity.UserId == userId && f.Entity.FolderId == folderId && f.Entity.Name == name)
                 .Any();
 
         public override List<Folder> GetAll(string userId) => _context.Items

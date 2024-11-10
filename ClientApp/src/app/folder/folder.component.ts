@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FoldersHttpService } from '../services/folders-service';
 import { FolderData } from '../models/folder-data';
 import { UserFolder } from '../models/user-folder';
+import { Item } from '../models/item';
 
 @Component({
   selector: 'app-folder',
@@ -17,6 +18,7 @@ export class FolderComponent implements OnInit {
   showDragBorder = false;
   droppedFiles: FileList | null = null;
   infoMessage = '';
+  tableItems: Item[] = [];
 
   constructor(private route: ActivatedRoute, private foldersService: FoldersHttpService, private router: Router) { }
 
@@ -41,7 +43,19 @@ export class FolderComponent implements OnInit {
   loadFolderData() {
     if (this.folderId) {
       this.foldersService.getFolderData(this.folderId)
-        .subscribe(data => this.fodlerData = data);
+        .subscribe(data => {
+          this.tableItems = [];
+          this.fodlerData = data;
+          data.subfolders.forEach(f => {
+            f.type = 'folder';
+            f.name = f.nameIdx == 0 ? f.name : f.name + ' (' + f.nameIdx + ')';
+            this.tableItems.push(f)
+          });
+          data.files.forEach(f => {
+            f.type = 'file';
+            this.tableItems.push(f)
+          });
+        });
     }
   }
 

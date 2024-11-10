@@ -19,10 +19,10 @@ namespace FilesApp.Repository
 
         long? GetLastModified(string userId, string id);
 
-        bool ExistsByName(string userId, string name);
+        bool ExistsByName(string userId, string folderId, string name);
 
-        bool IsTrackedByName(string userId, string name);
+        bool IsTrackedByName(string userId, string name, string folderId);
 
-        string? GetFolderIdByName(string userId, string name, bool isFolderAdded);
+        string? GetFolderIdByName(string userId, string parentId, string name, bool isFolderAdded);
     }
 }
