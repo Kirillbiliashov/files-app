@@ -4,6 +4,7 @@ import { LoginUser } from '../models/login-user';
 import { AuthHttpService } from '../services/auth-service';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
+import { UserService } from '../services/user-service';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +17,11 @@ export class LoginComponent {
   loggingIn = false;
   userForm: FormGroup;
 
-  constructor(private authService: AuthHttpService, private router: Router, private fb: FormBuilder) {
+  constructor(
+    private authService: AuthHttpService,
+    private router: Router,
+    private fb: FormBuilder,
+    private userService: UserService) {
     this.userForm = fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: [
@@ -40,7 +45,7 @@ export class LoginComponent {
         finalize(() => this.loggingIn = false)
       ).subscribe({
         next: (user) => {
-          localStorage.setItem('currentUser', JSON.stringify(user))
+          this.userService.setCurrentUser(user);
           this.router.navigate(['/'])
         },
         error: console.log

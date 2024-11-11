@@ -4,6 +4,7 @@ import { RegisterUser } from '../models/register-user';
 import { AuthHttpService } from '../services/auth-service';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
+import { UserService } from '../services/user-service';
 
 @Component({
   selector: 'app-register',
@@ -16,7 +17,11 @@ export class RegisterComponent {
   signingUp = false;
   userForm: FormGroup;
 
-  constructor(private authService: AuthHttpService, private router: Router, private fb: FormBuilder) {
+  constructor(
+    private authService: AuthHttpService, 
+    private router: Router, 
+    private fb: FormBuilder, 
+    private userService: UserService) {
     this.userForm = fb.group({
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', Validators.required],
@@ -43,8 +48,8 @@ export class RegisterComponent {
       )
         .subscribe({
           next: (user) => {
-            localStorage.setItem('currentUser', JSON.stringify(user))
-            this.router.navigate(['/'])
+            this.userService.setCurrentUser(user);
+            this.router.navigate(['/']);
           },
           error: console.log
         })

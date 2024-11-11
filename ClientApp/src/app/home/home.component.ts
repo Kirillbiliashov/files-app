@@ -6,6 +6,7 @@ import { FoldersHttpService } from '../services/folders-service';
 import { Router } from '@angular/router';
 import { Item } from '../models/item';
 import { UserFolder } from '../models/user-folder';
+import { UserService } from '../services/user-service';
 
 @Component({
   selector: 'app-home',
@@ -19,26 +20,29 @@ export class HomeComponent implements OnInit {
   showDragBorder = false;
   droppedFiles: FileList | null = null;
 
-  constructor(private filesService: FilesHttpService, private router: Router) { }
+  constructor(private filesService: FilesHttpService, private router: Router, private userService: UserService) {
+    const currentUserStr = localStorage.getItem('currentUser');
+    const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+    userService.setCurrentUser(currentUser);
+  }
 
   ngOnInit(): void {
     this.loadFiles();
   }
 
   loadFiles() {
-    console.log(`updaing files`);
     this.filesService.getFiles().subscribe(data => {
       this.tableItems = [];
       this.folders = data.folders;
       this.folders.forEach(f => {
-          f.type = 'folder';
-          f.name = f.nameIdx == 0 ? f.name : f.name + ' (' + f.nameIdx + ')';
-          this.tableItems.push(f)
-        });
-        data.files.forEach(f => {
-          f.type = 'file';
-          this.tableItems.push(f)
-        });
+        f.type = 'folder';
+        f.name = f.nameIdx == 0 ? f.name : f.name + ' (' + f.nameIdx + ')';
+        this.tableItems.push(f)
+      });
+      data.files.forEach(f => {
+        f.type = 'file';
+        this.tableItems.push(f)
+      });
     });
   }
 
