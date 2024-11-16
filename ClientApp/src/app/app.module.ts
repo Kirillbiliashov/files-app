@@ -16,6 +16,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { GoogleAuthCallbackComponent } from './google-auth-callback/google-auth-callback.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { SidebarFolderComponent } from './sidebar-folder/sidebar-folder.component';
+import { PageLayoutComponent } from './page-layout/page-layout.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { SidebarFolderComponent } from './sidebar-folder/sidebar-folder.componen
     LoginComponent,
     GoogleAuthCallbackComponent,
     SidebarComponent,
-    SidebarFolderComponent
+    SidebarFolderComponent,
+    PageLayoutComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

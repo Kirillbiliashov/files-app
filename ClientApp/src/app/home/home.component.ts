@@ -15,7 +15,6 @@ import { UserService } from '../services/user-service';
 export class HomeComponent implements OnInit {
   folderName: string = "";
   public tableItems: Item[] = [];
-  folders: UserFolder[] = [];
   infoMessage = '';
   showDragBorder = false;
   droppedFiles: FileList | null = null;
@@ -33,8 +32,7 @@ export class HomeComponent implements OnInit {
   loadFiles() {
     this.filesService.getFiles().subscribe(data => {
       this.tableItems = [];
-      this.folders = data.folders;
-      this.folders.forEach(f => {
+      data.folders.forEach(f => {
         f.type = 'folder';
         f.name = f.nameIdx == 0 ? f.name : f.name + ' (' + f.nameIdx + ')';
         this.tableItems.push(f)
@@ -44,33 +42,6 @@ export class HomeComponent implements OnInit {
         this.tableItems.push(f)
       });
     });
-  }
-
-  onNewInfo(message: string) {
-    this.infoMessage = message
-  }
-
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!this.showDragBorder) {
-      this.showDragBorder = true;
-    }
-  }
-
-  onDragLeave(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.showDragBorder = false;
-  }
-
-  onDrop(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.showDragBorder = false;
-    if (event.dataTransfer?.files) {
-      this.droppedFiles = event.dataTransfer.files;
-    }
   }
 
 }

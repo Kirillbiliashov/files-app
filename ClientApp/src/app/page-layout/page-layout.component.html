@@ -1,0 +1,47 @@
+<style>
+    .alert-primary {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: #f0f0f0;
+    color: black;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+
+  .dashed-border {
+    border: 2px dashed black;
+    border-radius: 10px;
+  }
+
+  .transparent-border {
+    border: 2px solid transparent;
+  }
+
+
+</style>
+
+<div class="row"  style="height: 100%" >
+    <div class="col-2">
+      <app-sidebar [folders]="this.folders"></app-sidebar>
+    </div>
+    <div class="col-10 p-2" (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)" [ngClass]="{'dashed-border': this.showDragBorder, 'transparent-border': !this.showDragBorder}">
+      <app-files-actions [droppedFiles]="this.droppedFiles" (onFileUpload)="onFileUpload()" (onInfoChange)="onInfoChange($event)"></app-files-actions>
+
+      <ng-content select="[table-title]"></ng-content>
+      <h3 *ngIf="enclosingFolderName">{{ enclosingFolderName }}</h3>
+
+      <ng-container *ngIf="this.tableItems.length">
+            <app-files-table [tableItems]="this.tableItems" (onFilesChange)="onFileUpload()" (onInfoChange)="onInfoChange($event)"></app-files-table>
+      </ng-container>
+      <div *ngIf="infoMessage" class="alert alert-primary" role="alert">
+        {{infoMessage}}
+      </div> 
+      
+    </div>
+  </div>

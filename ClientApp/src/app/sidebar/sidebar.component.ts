@@ -7,13 +7,8 @@ import { SidebarFolder } from '../models/sidebar-folder';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent implements OnInit {
-  @Input() folders!: UserFolder[];
+export class SidebarComponent  {
+  @Input() folders!: SidebarFolder[];
   foldersListDisplayed = true;
 
-  sidebarFolders!: SidebarFolder[];
-
-  ngOnInit(): void {
-    this.sidebarFolders = this.folders.map(f => new SidebarFolder(f));
-  }
 }

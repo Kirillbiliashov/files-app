@@ -25,9 +25,11 @@
   }
   </style>
   
+  <app-page-layout [tableItems]="this.tableItems" (fileUpload)="loadFolderData()" [enclosingFolderName]="this.enclosingFolderName">
+    <h3 table-title style="margin-top: 50px">All files</h3>
+  </app-page-layout>
 
-
-<div class="row" style="height: 100%" >
+<!-- <div class="row" style="height: 100%" >
   <div class="col-2" >
     <app-sidebar *ngIf="this.folders.length > 0" [folders]="this.folders"></app-sidebar>
   </div>
@@ -46,6 +48,6 @@
         {{infoMessage}}
       </div> 
   </div>
-</div>
+</div> -->
 
 

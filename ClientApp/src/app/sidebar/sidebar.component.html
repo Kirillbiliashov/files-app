@@ -27,7 +27,7 @@
         <span style="margin-left: 5px">Folders</span>
     </div>
     <div *ngIf="foldersListDisplayed">
-        <div *ngFor="let folder of sidebarFolders" class="d-flex flex-column" >
+        <div *ngFor="let folder of folders" class="d-flex flex-column" >
             <app-sidebar-folder [folder]="folder"></app-sidebar-folder>
         </div>
     </div>

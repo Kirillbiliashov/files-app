@@ -23,7 +23,10 @@
 
 
 </style>
-  <div class="row"  style="height: 100%" >
+<app-page-layout  [tableItems]="this.tableItems" (fileUpload)="loadFiles()">
+  <h3 table-title style="margin-top: 50px">All files</h3>
+</app-page-layout>
+  <!-- <div class="row"  style="height: 100%" >
     <div class="col-2">
       <app-sidebar [folders]="this.folders"></app-sidebar>
     </div>
@@ -41,4 +44,4 @@
       </div> 
       
     </div>
-  </div>
+  </div> -->

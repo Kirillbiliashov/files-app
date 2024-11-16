@@ -14,7 +14,6 @@ export class FolderComponent implements OnInit {
   folderName: string = "";
   folderId: string | undefined;
   fodlerData: FolderData | undefined;
-  folders: UserFolder[] = [];
   showDragBorder = false;
   droppedFiles: FileList | null = null;
   infoMessage = '';
@@ -27,17 +26,11 @@ export class FolderComponent implements OnInit {
       this.folderId = params['id'];
       this.loadFolderData();
     });
-    this.foldersService.getAllFolders().subscribe({
-      next: (res) => {
-        res.forEach(f => f.name = f.nameIdx == 0 ? f.name : f.name + ' (' + f.nameIdx + ')');
-        this.folders = res
-      },
-      error: console.log
-    })
   }
 
-  get enclosingFolderName(): string {
-    return this.fodlerData?.folder?.nameIdx == 0 ? this.fodlerData?.folder?.name : this.fodlerData?.folder?.name + ' (' + this.fodlerData?.folder?.nameIdx + ')'
+  get enclosingFolderName(): string | null {
+    if (!this.fodlerData || !this.fodlerData.folder) return null
+    return this.fodlerData.folder.nameIdx == 0 ? this.fodlerData.folder.name : this.fodlerData.folder.name + ' (' + this.fodlerData.folder.nameIdx + ')'
   }
 
   loadFolderData() {
@@ -65,34 +58,6 @@ export class FolderComponent implements OnInit {
         this.router.navigate(['/folders', res.folderId]);
       }
     })
-  }
-
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    if (!this.showDragBorder) {
-      this.showDragBorder = true;
-    }
-  }
-
-  onDragLeave(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.showDragBorder = false;
-  }
-
-  onDrop(event: DragEvent) {
-    console.log(`dropped`);
-    event.preventDefault();
-    event.stopPropagation();
-    this.showDragBorder = false;
-    if (event.dataTransfer?.files) {
-      this.droppedFiles = event.dataTransfer.files;
-    }
-  }
-
-  onNewInfo(message: string) {
-    this.infoMessage = message
   }
 
 }
