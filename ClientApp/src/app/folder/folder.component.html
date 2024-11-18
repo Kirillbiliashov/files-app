@@ -29,25 +29,5 @@
     <h3 table-title style="margin-top: 50px">All files</h3>
   </app-page-layout>
 
-<!-- <div class="row" style="height: 100%" >
-  <div class="col-2" >
-    <app-sidebar *ngIf="this.folders.length > 0" [folders]="this.folders"></app-sidebar>
-  </div>
-
-  <div class="col-10" class="col-10 p-2" (dragover)="onDragOver($event)"
-  (dragleave)="onDragLeave($event)"
-  (drop)="onDrop($event)" [ngClass]="{'dashed-border': this.showDragBorder, 'transparent-border': !this.showDragBorder}">
-    <app-files-actions [droppedFiles]="this.droppedFiles"  (onFileUpload)="loadFolderData()" (onInfoChange)="onNewInfo($event)"></app-files-actions>
-    <h5 style="margin-top: 50px" >All files</h5>
-    <h3 *ngIf="fodlerData?.folder">{{this.enclosingFolderName}}</h3>
-    <ng-container *ngIf="fodlerData">
-      <app-files-table [tableItems]="this.tableItems" (onFilesChange)="loadFolderData()" (onInfoChange)="onNewInfo($event)"></app-files-table>
-      
-      </ng-container>
-      <div *ngIf="infoMessage" class="alert alert-primary" role="alert">
-        {{infoMessage}}
-      </div> 
-  </div>
-</div> -->
 
 

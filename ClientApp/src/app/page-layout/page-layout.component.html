@@ -34,7 +34,18 @@
       <app-files-actions [droppedFiles]="this.droppedFiles" (onFileUpload)="onFileUpload()" (onInfoChange)="onInfoChange($event)"></app-files-actions>
 
       <ng-content select="[table-title]"></ng-content>
-      <h3 *ngIf="enclosingFolderName">{{ enclosingFolderName }}</h3>
+      <div class="d-flex align-items-center mb-2" *ngIf="enclosingFolderName">
+        <svg style="margin-right: 10px"  width="28px" height="28px" viewBox="0 0 16 16"
+        fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="SVGRepo_iconCarrier">
+          <path d="M0 1H6L9 4H16V14H0V1Z" fill="#00c7fc"></path>
+        </g>
+      </svg>
+        <h3 style="margin: 0; padding: 0" >{{ enclosingFolderName }}</h3>
+      </div>
+      
 
       <ng-container *ngIf="this.tableItems.length">
             <app-files-table [tableItems]="this.tableItems" (onFilesChange)="onFileUpload()" (onInfoChange)="onInfoChange($event)"></app-files-table>
