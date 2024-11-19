@@ -17,6 +17,7 @@ import { GoogleAuthCallbackComponent } from './google-auth-callback/google-auth-
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { SidebarFolderComponent } from './sidebar-folder/sidebar-folder.component';
 import { PageLayoutComponent } from './page-layout/page-layout.component';
+import { FormatBytesPipe } from './pipes/format-bytes-pipe';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { PageLayoutComponent } from './page-layout/page-layout.component';
     GoogleAuthCallbackComponent,
     SidebarComponent,
     SidebarFolderComponent,
-    PageLayoutComponent
+    PageLayoutComponent,
+    FormatBytesPipe
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
